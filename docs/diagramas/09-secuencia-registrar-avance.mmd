@@ -1,0 +1,18 @@
+sequenceDiagram
+  actor OP as Operario
+  actor SUP as Supervisor
+  participant C as AvanceController
+  participant LN as AvanceLN
+  participant QC as CalidadLN
+  participant DAO as RegistroAvanceDAO / LoteDAO / InspeccionDAO
+
+  OP->>C: registra metros en terminal táctil
+  C->>LN: registrar(dto)
+  LN->>DAO: obtenerMetaYVelocidadTeorica(asignacion)
+  LN->>LN: varianza = (avance - teórico) / teórico -> si < -15 % alerta (R-Varianza)
+  LN->>DAO: insertarRegistroAvance
+  SUP->>C: inspecciona lote
+  C->>QC: registrarInspeccion(lote, varianzaColor, tolerancia)
+  QC->>QC: si varianzaColor > tolerancia de ficha técnica -> no aprueba (RD7)
+  QC->>DAO: insertarInspeccion + actualizar lote + consolidar metros (transacción)
+  QC->>DAO: si progreso = 100 % -> habilitar Parte Diario y Cierre de Lote

@@ -1,0 +1,52 @@
+graph LR
+    subgraph APP["Aplicacion SIGPT (un solo artefacto .jar)"]
+        direction TB
+
+        subgraph P["02 FrontEnd · presentacion"]
+            PSEG[LoginController<br/>InicioController]
+            PPED[PedidoController<br/>ClienteController]
+            PABS[ProveedorController<br/>InsumoController<br/>KardexController]
+            PPLA[AsignacionController<br/>AvanceController<br/>CalidadController]
+            PREP[ReporteController]
+        end
+
+        subgraph N["01 BackEnd · negocio (fachadas LN)"]
+            NSEG[SeguridadLN]
+            NPED[PedidoLN<br/>ClienteLN]
+            NABS[ProveedorLN<br/>InsumoLN<br/>KardexLN]
+            NPLA[AsignacionLN<br/>AvanceLN<br/>CalidadLN]
+            NREP[ReporteGerencial<br/>FabricaReportes]
+        end
+
+        subgraph D["01 BackEnd · datos (JDBC)"]
+            DSEG[UsuarioDAO<br/>OpcionDAO<br/>RegistroAuditoriaDAO]
+            DPED[PedidoDAO<br/>ClienteDAO<br/>CotizacionDAO]
+            DABS[ProveedorDAO<br/>InsumoDAO<br/>KardexDAO]
+            DPLA[AsignacionDAO<br/>RegistroAvanceDAO]
+            DREP[ReporteDAO]
+        end
+
+        subgraph T["03 Transversal"]
+            TENT[entidades]
+            TUT[utiles]
+            TUW[utilesweb]
+        end
+
+        DB[("MySQL 8<br/>35 tablas")]
+    end
+
+    PC["PC de<br/>oficina"]
+    KIO["Terminal tactil<br/>kiosko"]
+    VPN["Externos<br/>por VPN"]
+    RESP["Respaldo<br/>externo"]
+
+    PC -->|HTTP| P
+    KIO -->|HTTP| P
+    VPN -->|HTTP| P
+    P --> N
+    N -->|interfaces DAO| D
+    D -->|SQL parametrizado| DB
+    T --- P
+    T --- N
+    T --- D
+    DB -.-> RESP

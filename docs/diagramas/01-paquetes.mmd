@@ -1,0 +1,45 @@
+graph TB
+  subgraph FE["02 FrontEnd · presentacion"]
+    PS[seguridad]
+    PP[pedidos]
+    PA[abastecimiento]
+    PL[planta]
+    PR[reportes]
+  end
+  subgraph BE["01 BackEnd · negocio"]
+    NS[SeguridadLN]
+    NP[PedidoLN / ClienteLN]
+    NA[InsumoLN / KardexLN]
+    NL[AsignacionLN / AvanceLN]
+    NR[ReporteGerencial]
+  end
+  subgraph DA["01 BackEnd · datos"]
+    DS[UsuarioDAO / OpcionDAO]
+    DP[PedidoDAO / ClienteDAO]
+    DAI[InsumoDAO / KardexDAO]
+    DL[AsignacionDAO / AvanceDAO]
+    DR[ReporteDAO]
+  end
+  TR["03 Transversal<br/>entidades · utiles · utilesweb"]
+  DB[("MySQL 8<br/>una sola BD")]
+
+  PS --> NS
+  PP --> NP
+  PA --> NA
+  PL --> NL
+  PR --> NR
+
+  NS --> DS
+  NP --> DP
+  NA --> DAI
+  NL --> DL
+  NR --> DR
+
+  DS --> DB
+  DP --> DB
+  DAI --> DB
+  DL --> DB
+  DR --> DB
+
+  TR -.visible.-> FE
+  TR -.visible.-> BE

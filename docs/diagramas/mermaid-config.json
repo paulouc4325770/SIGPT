@@ -1,0 +1,22 @@
+{
+  "theme": "base",
+  "themeVariables": {
+    "primaryColor": "#eef3f9",
+    "primaryTextColor": "#1e3a5f",
+    "primaryBorderColor": "#2c5282",
+    "lineColor": "#5a6b7d",
+    "secondaryColor": "#f4f6f9",
+    "tertiaryColor": "#ffffff",
+    "background": "#ffffff",
+    "mainBkg": "#eef3f9",
+    "nodeBorder": "#2c5282",
+    "clusterBkg": "#f7f9fc",
+    "clusterBorder": "#c3cedb",
+    "fontFamily": "Segoe UI, Arial, sans-serif",
+    "fontSize": "15px"
+  },
+  "flowchart": { "useMaxWidth": false, "htmlLabels": true, "curve": "basis" },
+  "class": { "useMaxWidth": false },
+  "state": { "useMaxWidth": false },
+  "er": { "useMaxWidth": false }
+}

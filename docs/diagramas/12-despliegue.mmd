@@ -1,0 +1,44 @@
+graph TB
+    subgraph PLANTA["PLANTA TEXTIL — LAN cerrada (intranet)"]
+        subgraph SALA["Sala tecnica"]
+            SRVAPP["<b>Servidor de aplicacion</b><br/>Linux Ubuntu Server LTS<br/>SIGPT 1.0.0 (un solo .jar)<br/>Tomcat embebido :8080"]
+            SRVBD["<b>Servidor de base de datos</b><br/>Linux Ubuntu Server LTS<br/>MySQL 8.0.46 (InnoDB, utf8mb4)<br/>:3306"]
+            UPS["UPS<br/>respaldo electrico"]
+        end
+
+        subgraph OFICINA["Oficina de produccion y logistica"]
+            PCJ["PC Jefe de Produccion<br/>Windows 10/11"]
+            PCL["PC Jefe de Logistica<br/>Windows 10/11"]
+            PCG["PC Gerencia General<br/>Windows 10/11"]
+        end
+
+        subgraph PISOPLANTA["Piso de planta"]
+            TER1["Terminal tactil 1 (kiosko)<br/>Operario"]
+            TER2["Terminal tactil 2 (kiosko)<br/>Supervisor"]
+            TER3["Terminal tactil 3 (kiosko)<br/>Almacen"]
+            WIFI["Red WiFi industrial<br/>con repetidores"]
+        end
+    end
+
+    subgraph EXTERNO["Fuera de la planta — acceso por VPN certificada"]
+        CL["Cliente<br/>(navegador)"]
+        PRV["Proveedor<br/>(navegador)"]
+    end
+
+    RESP["Respaldo externo<br/>copia diaria de BD y configuracion<br/>(RC7)"]
+
+    PCJ -->|HTTP| SRVAPP
+    PCL -->|HTTP| SRVAPP
+    PCG -->|HTTP| SRVAPP
+    TER1 -->|HTTP| WIFI
+    TER2 -->|HTTP| WIFI
+    TER3 -->|HTTP| WIFI
+    WIFI -->|HTTP| SRVAPP
+    CL -.->|VPN| SRVAPP
+    PRV -.->|VPN| SRVAPP
+
+    SRVAPP -->|JDBC :3306| SRVBD
+    SRVAPP --- UPS
+    SRVBD --- UPS
+    SRVBD -.->|copia diaria| RESP
+    SRVAPP -.->|configuracion| RESP

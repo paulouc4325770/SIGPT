@@ -189,11 +189,22 @@ cambiarlos sin recompilar.
 
 | Documento | Ubicación |
 |---|---|
-| Documento de arquitectura (vistas 4+1) | `D:\Diseño\SIGPT-Documento-de-Arquitectura.md` |
+| Documento de arquitectura (vistas 4+1) | `docs/Documento-de-Arquitectura.md` |
 | Decisiones de diseño D1–D10 | `D:\Diseño\SIGPT_Decisiones_de_Diseno.md` |
-| Diagramas | `docs/diagramas/` |
+| **20 diagramas** (12 propios + 8 del Modelo de Negocio) | `docs/diagramas/` |
+| Fuente editable de los diagramas | `docs/diagramas/*.mmd` (Mermaid) |
 | Esquema de base de datos | `src/main/resources/db/schema.sql` |
 | Datos de prueba | `src/main/resources/db/seed.sql` |
+
+### Regenerar los diagramas
+
+```bash
+npm install -g @mermaid-js/mermaid-cli
+cd docs/diagramas
+for f in *.mmd; do
+  mmdc -i "$f" -o "${f%.mmd}.png" -p puppeteer.json -c mermaid-config.json -b white -s 2
+done
+```
 
 ---
 
@@ -201,9 +212,20 @@ cambiarlos sin recompilar.
 
 | Entregable | Contenido | Estado |
 |---|---|---|
-| E1 | Base de datos, esqueleto de código, módulo de seguridad, diagramas | En curso |
+| E1 | Base de datos, esqueleto de código, módulo de seguridad, vistas, diagramas | **Completo** |
 | E2 | Pedidos, clientes y planta | Pendiente |
 | E3 | Abastecimiento, reportes y cierre técnico | Pendiente |
+
+### Pruebas actuales
+
+| Suite | Casos | Qué cubre |
+|---|---|---|
+| `SeguridadLNTest` | 7 | Autenticación, intentos fallidos, bloqueo, usuario inactivo, no revelar cuentas |
+| `PruebasPlantillasTest` | 14 | Render de las 10 plantillas + el filtro de permisos en cada petición |
+| `HashHelperTest` | 6 | Hash PBKDF2, salt por usuario, rechazo de clave vacía |
+| `MenuHelperTest` | 5 | Agrupación del menú, control de acceso por ruta |
+| `SigptApplicationTests` | 2 | Arranque del contexto de Spring |
+| **Total** | **34** | `mvn clean verify` |
 
 ---
 

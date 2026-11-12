@@ -458,7 +458,7 @@ classDiagram
   SolicitudCotizacion "1" --> "*" CotizacionProveedor : recibe
   Proveedor "1" --> "*" CotizacionProveedor : cotiza
   CotizacionProveedor "1" --> "0..1" OrdenCompra : adjudica
-  OrdenCompra "1" ||-- "*" OrdenCompraDetalle : contiene
+  OrdenCompra "1" -- "*" OrdenCompraDetalle : contiene
   OrdenCompra "1" --> "*" MovimientoKardex : ingreso
 ```
 
@@ -805,7 +805,7 @@ erDiagram
   }
   FICHA_TECNICA {
     int id_ficha PK
-    int id_pedido FK_UK
+    int id_pedido FK "UK"
     string tipo_hilado
     decimal gramaje_m2
     string color_pantone
@@ -850,8 +850,8 @@ erDiagram
     string estado
   }
   ORDEN_PRODUCCION_INSUMO {
-    int id_orden_produccion PK_FK
-    int id_insumo PK_FK
+    int id_orden_produccion PK "FK"
+    int id_insumo PK "FK"
     decimal cantidad_teorica
   }
   PROVEEDOR {
@@ -906,8 +906,8 @@ erDiagram
     string estado
   }
   ORDEN_COMPRA_DETALLE {
-    int id_orden_compra PK_FK
-    int id_insumo PK_FK
+    int id_orden_compra PK "FK"
+    int id_insumo PK "FK"
     decimal cantidad
     decimal precio_unitario
   }
@@ -973,8 +973,8 @@ erDiagram
     decimal metros
   }
   LOTE_INSUMO {
-    int id_lote PK_FK
-    int id_movimiento_kardex PK_FK
+    int id_lote PK "FK"
+    int id_movimiento_kardex PK "FK"
     decimal cantidad_consumida
   }
   INSPECCION_CALIDAD {
@@ -1514,10 +1514,24 @@ Nunca se sacrifican: seguridad, pedidos con RD1 y RD2, y el terminal tactil de a
 | Entregable | Componente | Estado | Evidencia |
 |---|---|---|---|
 | E1 | Esquema de base de datos | **Completo** | 35 tablas, 47 FK, 22 CHECK, 101 indices, aplicado en MySQL 8.0.46 |
-| E1 | Semilla de datos | **Completo** | 8 perfiles, 31 opciones de menu, 13 parametros, datos de demostracion |
-| E1 | Estructura de codigo | **Completo** | 3 niveles x 5 modulos, 33 entidades, 66 clases Java |
+| E1 | Semilla de datos | **Completo** | 8 perfiles, 31 opciones de menu, 63 permisos, 13 parametros, datos de demostracion |
+| E1 | Estructura de codigo | **Completo** | 3 niveles x 5 modulos, 33 entidades, 68 clases Java |
 | E1 | Modulo de seguridad | **Completo** | Login PBKDF2, bloqueo por intentos, menu por perfil desde la BD, filtro por peticion, auditoria |
-| E1 | Pruebas | **Completo** | 20 pruebas en verde (`mvn clean verify`) |
+| E1 | Vistas de las 7 pantallas | **Completo** | 10 plantillas Thymeleaf verificadas por render en el build |
+| E1 | Diagramas 4+1 | **Completo** | 12 diagramas Mermaid exportados a PNG + 8 del Modelo de Negocio |
+| E1 | Pruebas | **Completo** | 34 pruebas en verde (`mvn clean verify`) |
 | E1 | Integracion continua | **Completo** | `.github/workflows/ci.yml` con `mvn clean verify` |
-| E1 | Diagramas 4+1 | En curso | Paquetes, clases por modulo, estados y secuencias ya en este documento; faltan las vistas de implementacion y fisica como grafico |
-| E1 | Plantillas de las 7 pantallas | En curso | Login, inicio y errores listas; faltan pedidos, abastecimiento, planta y reportes |
+| E2 | Pedidos, Clientes y Planta | Pendiente | Sprint 2 |
+| E3 | Abastecimiento, Reportes y cierre tecnico | Pendiente | Sprint 3 |
+
+### 14.7 Herramientas de apoyo
+
+| Herramienta | Uso | Como se ejecuta |
+|---|---|---|
+| `mermaid-cli` | Exporta los `.mmd` a PNG | `mmdc -i docs/diagramas/X.mmd -o docs/diagramas/X.png -p docs/diagramas/puppeteer.json -c docs/diagramas/mermaid-config.json -b white -s 2` |
+| `pypdf` | Extrae el texto de los PDF del curso | `python -c "from pypdf import PdfReader; ..."` |
+| `pytest`/`JUnit` | Pruebas | `mvn test` |
+
+Los `.mmd` son la **fuente editable** de los diagramas; los `.png` son la version que
+se inserta en el documento del curso. El tema grafico esta en
+`docs/diagramas/mermaid-config.json` y se aplica a todos por igual.

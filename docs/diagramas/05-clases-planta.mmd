@@ -1,0 +1,77 @@
+classDiagram
+  class Operario {
+    +Integer idOperario
+    +String codigo
+    +String nombres
+    +String especialidad
+    +Integer idUsuario
+    +String estado
+  }
+  class Maquina {
+    +Integer idMaquina
+    +String codigo
+    +String nombre
+    +String tipo
+    +String estado
+    +BigDecimal velocidadTeoricaMtsHora
+    +Decimal horasPorTurno
+  }
+  class Turno {
+    +Integer idTurno
+    +String codigo
+    +LocalTime horaInicio
+    +LocalTime horaFin
+    +Decimal horas
+  }
+  class Asignacion {
+    +Integer idAsignacion
+    +Integer idOperario
+    +Integer idMaquina
+    +Integer idTurno
+    +LocalDate fecha
+    +Integer idOrdenProduccion
+    +BigDecimal metaMetros
+    +String estado
+  }
+  class RegistroAvance {
+    +Integer idAvance
+    +Integer idAsignacion
+    +Integer idOrdenProduccion
+    +LocalDate fecha
+    +BigDecimal metrosProducidos
+    +BigDecimal metrosMerma
+    +BigDecimal varianzaPct
+    +String estadoCalidad
+    +String observacion
+  }
+  class Lote {
+    +Integer idLote
+    +String codigo
+    +Integer idOrdenProduccion
+    +Integer idAsignacion
+    +BigDecimal metros
+  }
+  class InspeccionCalidad {
+    +Integer idInspeccion
+    +Integer idLote
+    +BigDecimal varianzaColorPct
+    +BigDecimal toleranciaAplicada
+    +String resultado
+    +String observacion
+  }
+  class Incidencia {
+    +Integer idIncidencia
+    +Integer idAvance
+    +Integer idMaquina
+    +String tipo
+    +String descripcion
+    +String estado
+  }
+  Operario "1" --> "*" Asignacion : asume
+  Maquina "1" --> "*" Asignacion : ocupa
+  Turno "1" --> "*" Asignacion : en
+  OrdenProduccion "1" --> "*" Asignacion : planifica
+  Asignacion "1" --> "*" RegistroAvance : reporta
+  OrdenProduccion "1" --> "*" Lote : produce
+  Lote "1" --> "*" InspeccionCalidad : inspeccionada
+  RegistroAvance "1" --> "*" Incidencia : genera

@@ -1,0 +1,25 @@
+sequenceDiagram
+  actor JP as Jefe de Producción
+  participant V as Vista Bandeja Pedidos
+  participant C as PedidoController
+  participant LN as PedidoLN
+  participant P as ParametrosNegocio
+  participant DAO as PedidoDAO / ClienteDAO / FichaTecnicaDAO
+  participant DB as MySQL
+
+  JP->>V: "Nuevo Pedido"
+  V->>C: GET /pedidos/nuevo
+  C->>LN: listarClientes()
+  LN->>DAO: listar()
+  DAO->>DB: SELECT
+  C-->>V: formulario (clientes, ficha técnica)
+  JP->>C: POST /pedidos (datos de ficha técnica)
+  C->>LN: registrar(dto)
+  LN->>P: get("PEDIDO_MINIMO_METROS")
+  LN->>LN: validar metros >= 1000 (RD1)
+  LN->>LN: evaluarViabilidad(fechaEntrega) : máquinas + tintorería + mano de obra
+  LN->>DAO: guardarPedido + guardarFichaTecnica (transacción)
+  DAO->>DB: INSERT
+  LN->>DAO: registrarAuditoria("pedidos","registrar",codPedido)
+  LN-->>C: codPedido
+  C-->>JP: "Pedido registrado" (estado = Registrado)

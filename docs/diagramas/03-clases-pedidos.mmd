@@ -1,0 +1,61 @@
+classDiagram
+  class Cliente {
+    +Integer idCliente
+    +String codigo
+    +String razonSocial
+    +String rucTaxId
+    +String pais
+    +String contacto
+    +String correo
+    +String telefono
+    +String estado
+  }
+  class Pedido {
+    +Integer idPedido
+    +String codPedido
+    +Integer idCliente
+    +Decimal metros
+    +LocalDate fechaEntrega
+    +EstadoPedido estado
+  }
+  class FichaTecnica {
+    +Integer idFicha
+    +Integer idPedido
+    +String tipoHilado
+    +BigDecimal gramajeM2
+    +String colorPantone
+    +String composicion
+    +BigDecimal toleranciaColor
+  }
+  class Cotizacion {
+    +Integer idCotizacion
+    +Integer idPedido
+    +BigDecimal montoTotal
+    +String moneda
+    +LocalDate fechaEmision
+    +LocalDate fechaVigencia
+    +String estado
+  }
+  class Adelanto {
+    +Integer idAdelanto
+    +Integer idCotizacion
+    +BigDecimal monto
+    +LocalDate fechaRegistro
+    +Boolean verificado
+    +String referencia
+  }
+  class OrdenProduccion {
+    +Integer idOrden
+    +String codOrden
+    +Integer idPedido
+    +BigDecimal metrosTotales
+    +BigDecimal metrosConsolidados
+    +Decimal horasMaquinaPrevistas
+    +Decimal horasHombrePrevistas
+    +String estado
+  }
+  Cliente "1" --> "*" Pedido : requiere
+  Pedido "1" *-- "1" FichaTecnica : compone
+  Pedido "1" --> "*" Cotizacion : cotiza
+  Cotizacion "1" --> "*" Adelanto : recibe
+  Pedido "1" --> "0..1" OrdenProduccion : genera al 40%

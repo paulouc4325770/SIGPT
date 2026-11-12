@@ -1,0 +1,19 @@
+sequenceDiagram
+  actor SUP as Supervisor de Tareas
+  participant C as AsignacionController
+  participant LN as AsignacionLN
+  participant P as ParametrosNegocio
+  participant DAO as AsignacionDAO / MaquinaDAO / OperarioDAO
+
+  SUP->>C: Selecciona OP "En Producción"
+  C->>LN: listarOrdenesEnProduccion()
+  C->>LN: listarMaquinasPorEstado() / listarOperariosPorTurno()
+  SUP->>C: asigna operario + máquina + turno + meta de metros
+  C->>LN: registrar(dto)
+  LN->>DAO: consultarTurnosDelOperario(operario, fecha)
+  LN->>P: get("JORNADA_MAXIMA_HORAS") = 16
+  LN->>LN: validar horas acumuladas < 16 (RD3) -> si no, bloquea y explica
+  LN->>DAO: consultarEstadoMaquina(maquina)
+  LN->>LN: si ocupada/mantenimiento -> sugiere máquina de back-up
+  LN->>DAO: insertarAsignacion (transacción)
+  LN-->>C: cronograma diario de labores

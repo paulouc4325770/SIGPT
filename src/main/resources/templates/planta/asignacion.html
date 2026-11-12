@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head(${titulo})}"></head>
+<body>
+<div th:replace="~{layout :: layout(~{::contenido})}"></div>
+
+<div th:fragment="contenido">
+  <h2 class="titulo-pantalla">Asignar Operarios y Maquinaria</h2>
+
+  <div class="alert alert-danger" th:if="${mensajeError}" th:text="${mensajeError}">
+    El operario excede el limite permitido de horas de trabajo: el sistema bloquea la asignacion
+    y muestra el motivo (Regla R-Turno / RD3).
+  </div>
+
+  <div class="row g-3">
+    <!-- Ordenes de produccion en curso -->
+    <div class="col-12 col-lg-4">
+      <div class="card h-100">
+        <div class="card-header">Ordenes de Produccion "En Produccion"</div>
+        <div class="list-group list-group-flush">
+          <a th:each="op : ${ordenes}" th:href="@{'/planta/asignacion?orden=' + ${op.idOrden}}"
+             class="list-group-item list-group-item-action">
+            <div class="d-flex justify-content-between">
+              <strong th:text="${op.codOrden}">OP-0451</strong>
+              <span class="text-muted" th:text="${op.metrosTotales} + ' m'">0 m</span>
+            </div>
+            <small class="text-muted"
+                   th:text="'Consolidado: ' + ${op.metrosConsolidados} + ' m'">0 m</small>
+          </a>
+          <div class="list-group-item text-muted" th:if="${#lists.isEmpty(ordenes)}">
+            No hay ordenes en produccion.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tablero de asignacion -->
+    <div class="col-12 col-lg-8">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span th:text="'Asignacion de la OP ' + (${ordenSeleccionada != null} ? ${ordenSeleccionada.codOrden} : '')">
+            Asignacion
+          </span>
+          <span class="text-muted small" th:text="${fechaAsignacion}">19/07/2026</span>
+        </div>
+        <div class="card-body">
+          <!-- Leyenda de estados -->
+          <div class="d-flex flex-wrap gap-3 mb-3 small">
+            <span><span class="badge bg-success">Asignado</span> turno asignado</span>
+            <span><span class="badge bg-secondary">Disponible</span> disponible</span>
+            <span><span class="badge bg-danger">Bloqueado</span> bloqueado por Regla R-Turno (16 h consecutivas)</span>
+          </div>
+
+          <form th:action="@{/planta/asignacion/guardar}" method="post" th:object="${asignacionForm}">
+            <div class="row g-3 mb-3">
+              <div class="col-12 col-md-4">
+                <label class="form-label" for="idOperario">Operario</label>
+                <select class="form-select" id="idOperario" th:field="*{idOperario}">
+                  <option value="">Seleccione</option>
+                  <option th:each="o : ${operarios}" th:value="${o.idOperario}"
+                          th:text="${o.codigo + ' - ' + o.nombres}">OP-001</option>
+                </select>
+              </div>
+              <div class="col-12 col-md-4">
+                <label class="form-label" for="idMaquina">Maquina</label>
+                <select class="form-select" id="idMaquina" th:field="*{idMaquina}">
+                  <option value="">Seleccione</option>
+                  <option th:each="m : ${maquinas}" th:value="${m.idMaquina}"
+                          th:text="${m.codigo + ' - ' + m.nombre}" th:disabled="${m.estado != 'LIBRE'}">
+                    TC-009
+                  </option>
+                </select>
+              </div>
+              <div class="col-12 col-md-4">
+                <label class="form-label" for="idTurno">Turno</label>
+                <select class="form-select" id="idTurno" th:field="*{idTurno}">
+                  <option th:each="t : ${turnos}" th:value="${t.idTurno}"
+                          th:text="${t.nombre}">Manana</option>
+                </select>
+              </div>
+              <div class="col-12 col-md-4">
+                <label class="form-label" for="fecha">Fecha</label>
+                <input type="date" class="form-control" id="fecha" th:field="*{fecha}" required>
+              </div>
+              <div class="col-12 col-md-4">
+                <label class="form-label" for="metaMetros">Meta de metros</label>
+                <input type="number" step="0.01" min="0" class="form-control" id="metaMetros"
+                       th:field="*{metaMetros}">
+              </div>
+            </div>
+            <div class="d-flex gap-2 justify-content-end">
+              <button type="reset" class="btn btn-outline-secondary">Cancelar</button>
+              <button type="submit" class="btn btn-primary">Asignar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Estado de las maquinas -->
+      <div class="card mt-3">
+        <div class="card-header">Estado de las maquinas</div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead>
+            <tr>
+              <th>Maquina</th>
+              <th>Tipo</th>
+              <th>Estado</th>
+              <th>Velocidad teorica</th>
+              <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="m : ${maquinas}">
+              <td th:text="${m.codigo} + ' - ' + ${m.nombre}">TC-001</td>
+              <td th:text="${m.tipo}">TELAR_CIRCULAR</td>
+              <td>
+                <span class="badge"
+                      th:classappend="${m.estado == 'LIBRE' ? 'bg-secondary'
+                        : (m.estado == 'OCUPADA' ? 'bg-primary'
+                        : (m.estado == 'MANTENIMIENTO' ? 'bg-danger' : 'bg-warning'))"
+                      th:text="${m.estado}">LIBRE</span>
+              </td>
+              <td th:text="${m.velocidadTeoricaMtsHora} + ' m/h'">0 m/h</td>
+              <td class="text-end">
+                <span class="badge bg-secondary" th:if="${m.estado == 'MANTENIMIENTO'}">mantenim.</span>
+                <span class="badge bg-warning" th:if="${m.estado == 'BACKUP'}">back-up</span>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

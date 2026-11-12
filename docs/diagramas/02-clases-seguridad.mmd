@@ -1,0 +1,37 @@
+classDiagram
+  class Usuario {
+    +Integer idUsuario
+    +String codUsuario
+    +String claveHash
+    +String nombres
+    +String area
+    +Integer idPerfil
+    +Integer intentosFallidos
+    +LocalDateTime bloqueadoHasta
+    +Boolean estado
+  }
+  class Perfil {
+    +Integer idPerfil
+    +String codPerfil
+    +String nombrePerfil
+  }
+  class Opcion {
+    +Integer idOpcion
+    +String nombreOpcion
+    +String urlOpcion
+    +String rutaImagen
+    +Integer nroOrden
+    +Integer idOpcionRef
+  }
+  class RegistroAuditoria {
+    +Long idRegistro
+    +String codUsuario
+    +LocalDateTime fechaHora
+    +String modulo
+    +String operacion
+    +String entidad
+    +String idEntidad
+  }
+  Usuario "1" --> "1" Perfil : perfil asignado
+  Perfil "1" --> "*" Opcion : perfil_opcion
+  Usuario "1" --> "*" RegistroAuditoria : audita

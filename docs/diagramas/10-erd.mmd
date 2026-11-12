@@ -1,0 +1,300 @@
+erDiagram
+  USUARIO ||--|| PERFIL : "perfil asignado"
+  PERFIL ||--o{ PERFIL_OPCION : "accede a"
+  OPCION ||--o{ PERFIL_OPCION : "opcion"
+  OPCION ||--o{ OPCION : "opcion padre (jerarquia del menu)"
+  USUARIO ||--o{ REGISTRO_AUDITORIA : "genera"
+
+  CLIENTE ||--o{ PEDIDO : "solicita"
+  PEDIDO ||--|| FICHA_TECNICA : "compone"
+  PEDIDO ||--o{ COTIZACION : "recibe"
+  COTIZACION ||--o{ ADELANTO : "registra"
+  TIPO_CAMBIO ||--o{ COTIZACION : "valoriza (CHG-02)"
+  PEDIDO ||--o| ORDEN_PRODUCCION : "se convierte (RD2)"
+
+  PROVEEDOR ||--o{ INSUMO : "homologa"
+  ORDEN_PRODUCCION ||--o{ ORDEN_PRODUCCION_INSUMO : "planifica consumo teorico"
+  PROVEEDOR ||--o{ COTIZACION_PROVEEDOR : "responde RFQ"
+  ORDEN_PRODUCCION ||--o{ SOLICITUD_COTIZACION : "origina RFQ"
+  SOLICITUD_COTIZACION ||--o{ COTIZACION_PROVEEDOR : "reune respuestas"
+  COTIZACION_PROVEEDOR ||--o| ORDEN_COMPRA : "se adjudica en"
+  PROVEEDOR ||--o{ ORDEN_COMPRA : "atiende"
+  ORDEN_COMPRA ||--|{ ORDEN_COMPRA_DETALLE : "contiene"
+  INSUMO ||--o{ ORDEN_COMPRA_DETALLE : "se pide"
+  ORDEN_COMPRA ||--o{ MOVIMIENTO_KARDEX : "genera ingreso"
+  INSUMO ||--o{ MOVIMIENTO_KARDEX : "se movimenta"
+
+  ORDEN_PRODUCCION ||--o{ ASIGNACION : "planifica"
+  OPERARIO ||--o{ ASIGNACION : "asume"
+  MAQUINA ||--o{ ASIGNACION : "ocupa"
+  TURNO ||--o{ ASIGNACION : "en"
+  ASIGNACION ||--o{ REGISTRO_AVANCE : "reporta"
+  ORDEN_PRODUCCION ||--o{ REGISTRO_AVANCE : "avanza"
+  ORDEN_PRODUCCION ||--o{ LOTE : "produce"
+  ASIGNACION ||--o{ LOTE : "origina"
+  LOTE ||--o{ INSPECCION_CALIDAD : "inspeccionada"
+  LOTE ||--o{ LOTE_INSUMO : "consume"
+  MOVIMIENTO_KARDEX ||--o{ LOTE_INSUMO : "es el origen"
+  REGISTRO_AVANCE ||--o{ INCIDENCIA : "origina"
+  MAQUINA ||--o{ INCIDENCIA : "sufre"
+  ORDEN_PRODUCCION ||--o| PARTE_DIARIO_PRODUCCION : "cierra al 100%"
+
+  USUARIO {
+    int id_usuario PK
+    string cod_usuario UK
+    string clave_hash
+    string nombres
+    string area
+    int id_perfil FK
+    int intentos_fallidos
+    datetime bloqueado_hasta
+    boolean estado
+    datetime fecha_registro
+  }
+  PERFIL {
+    int id_perfil PK
+    string cod_perfil UK
+    string nombre_perfil
+    boolean estado
+  }
+  OPCION {
+    int id_opcion PK
+    string nombre_opcion
+    string url_opcion
+    string ruta_imagen
+    int nro_orden
+    int id_opcion_ref FK
+    boolean estado
+  }
+  PERFIL_OPCION {
+    int id_perfil FK
+    int id_opcion FK
+    boolean estado
+  }
+  REGISTRO_AUDITORIA {
+    long id_registro PK
+    string cod_usuario
+    datetime fecha_hora
+    string modulo
+    string operacion
+    string entidad
+    string id_entidad
+    string detalle
+  }
+  CLIENTE {
+    int id_cliente PK
+    string codigo UK
+    string razon_social
+    string ruc_tax_id UK
+    string pais
+    string contacto
+    string correo
+    string telefono
+    string estado
+  }
+  PEDIDO {
+    int id_pedido PK
+    string cod_pedido UK
+    int id_cliente FK
+    decimal metros
+    date fecha_entrega
+    string estado
+  }
+  FICHA_TECNICA {
+    int id_ficha PK
+    int id_pedido FK "UK"
+    string tipo_hilado
+    decimal gramaje_m2
+    string color_pantone
+    string composicion
+    decimal tolerancia_color
+  }
+  COTIZACION {
+    int id_cotizacion PK
+    int id_pedido FK
+    decimal monto_total
+    string moneda
+    date fecha_emision
+    date fecha_vigencia
+    string estado
+  }
+  TIPO_CAMBIO {
+    int id_tipo_cambio PK
+    string moneda_origen
+    string moneda_destino
+    decimal valor
+    date fecha_vigencia
+    boolean estado
+  }
+  ADELANTO {
+    int id_adelanto PK
+    int id_cotizacion FK
+    decimal monto
+    date fecha_adelanto
+    boolean verificado
+    string referencia
+  }
+  ORDEN_PRODUCCION {
+    int id_orden PK
+    string cod_orden UK
+    int id_pedido FK
+    decimal metros_totales
+    decimal metros_consolidados
+    decimal horas_maquina_previstas
+    decimal horas_hombre_previstas
+    date fecha_inicio
+    date fecha_fin
+    string estado
+  }
+  ORDEN_PRODUCCION_INSUMO {
+    int id_orden_produccion PK "FK"
+    int id_insumo PK "FK"
+    decimal cantidad_teorica
+  }
+  PROVEEDOR {
+    int id_proveedor PK
+    string codigo UK
+    string razon_social
+    string ruc
+    string tipo
+    string contacto
+    string correo
+    string telefono
+    string estado
+  }
+  INSUMO {
+    int id_insumo PK
+    string codigo UK
+    int id_proveedor FK
+    string nombre
+    string tipo
+    string unidad_medida
+    decimal stock_minimo
+    decimal stock_actual
+    string ruta_msds
+    string estado
+  }
+  SOLICITUD_COTIZACION {
+    int id_solicitud PK
+    string codigo UK
+    int id_orden_produccion FK
+    date fecha_emision
+    date fecha_cierre
+    string estado
+  }
+  COTIZACION_PROVEEDOR {
+    int id_cotizacion_proveedor PK
+    int id_solicitud FK
+    int id_proveedor FK
+    decimal precio_unitario
+    int tiempo_entrega_dias
+    string certificaciones
+    string estado
+  }
+  ORDEN_COMPRA {
+    int id_orden_compra PK
+    string codigo UK
+    int id_proveedor FK
+    int id_solicitud FK
+    decimal monto_total
+    string moneda
+    string ruta_pdf
+    date fecha_entrega_esperada
+    string estado
+  }
+  ORDEN_COMPRA_DETALLE {
+    int id_orden_compra PK "FK"
+    int id_insumo PK "FK"
+    decimal cantidad
+    decimal precio_unitario
+  }
+  MOVIMIENTO_KARDEX {
+    int id_movimiento PK
+    int id_insumo FK
+    string tipo_movimiento
+    decimal cantidad
+    decimal precio_unitario
+    int id_orden_compra FK
+    date fecha
+  }
+  OPERARIO {
+    int id_operario PK
+    string codigo UK
+    string nombres
+    string especialidad
+    int id_usuario FK
+    string estado
+  }
+  MAQUINA {
+    int id_maquina PK
+    string codigo UK
+    string nombre
+    string tipo
+    string estado
+    decimal velocidad_teorica_mts_hora
+    decimal horas_por_turno
+  }
+  TURNO {
+    int id_turno PK
+    string codigo UK
+    time hora_inicio
+    time hora_fin
+    decimal horas
+  }
+  ASIGNACION {
+    int id_asignacion PK
+    int id_operario FK
+    int id_maquina FK
+    int id_turno FK
+    date fecha
+    int id_orden_produccion FK
+    decimal meta_metros
+    string estado
+  }
+  REGISTRO_AVANCE {
+    int id_avance PK
+    int id_asignacion FK
+    int id_orden_produccion FK
+    date fecha
+    decimal metros_producidos
+    decimal metros_merma
+    decimal varianza_pct
+    string estado_calidad
+    string observacion
+  }
+  LOTE {
+    int id_lote PK
+    string codigo UK
+    int id_orden_produccion FK
+    int id_asignacion FK
+    decimal metros
+  }
+  LOTE_INSUMO {
+    int id_lote PK "FK"
+    int id_movimiento_kardex PK "FK"
+    decimal cantidad_consumida
+  }
+  INSPECCION_CALIDAD {
+    int id_inspeccion PK
+    int id_lote FK
+    decimal varianza_color_pct
+    decimal tolerancia_aplicada
+    string resultado
+    string observacion
+  }
+  INCIDENCIA {
+    int id_incidencia PK
+    int id_avance FK
+    int id_maquina FK
+    string tipo
+    string descripcion
+    string estado
+  }
+  PARTE_DIARIO_PRODUCCION {
+    int id_parte PK
+    int id_orden_produccion FK
+    date fecha
+    decimal horas_hombre
+    decimal horas_maquina
+    decimal metros
+  }

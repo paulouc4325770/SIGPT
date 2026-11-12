@@ -1,0 +1,72 @@
+classDiagram
+  class Proveedor {
+    +Integer idProveedor
+    +String codigo
+    +String razonSocial
+    +String ruc
+    +String tipo
+    +String contacto
+    +String estado
+  }
+  class Insumo {
+    +Integer idInsumo
+    +String codigo
+    +Integer idProveedor
+    +String nombre
+    +String tipo
+    +String unidadMedida
+    +BigDecimal stockMinimo
+    +BigDecimal stockActual
+    +String rutaMsds
+    +String estado
+  }
+  class SolicitudCotizacion {
+    +Integer idSolicitud
+    +String codigo
+    +Integer idOrdenProduccion
+    +LocalDate fechaEmision
+    +LocalDate fechaCierre
+    +String estado
+  }
+  class CotizacionProveedor {
+    +Integer idCotizacion
+    +Integer idSolicitud
+    +Integer idProveedor
+    +BigDecimal precioUnitario
+    +Integer tiempoEntregaDias
+    +String certificaciones
+    +String estado
+  }
+  class OrdenCompra {
+    +Integer idOrdenCompra
+    +String codigo
+    +Integer idProveedor
+    +Integer idSolicitud
+    +BigDecimal montoTotal
+    +String moneda
+    +String rutaPdf
+    +String estado
+  }
+  class OrdenCompraDetalle {
+    +Integer idOrdenCompra
+    +Integer idInsumo
+    +BigDecimal cantidad
+    +BigDecimal precioUnitario
+  }
+  class MovimientoKardex {
+    +Integer idMovimiento
+    +Integer idInsumo
+    +String tipoMovimiento
+    +BigDecimal cantidad
+    +BigDecimal precioUnitario
+    +Integer idOrdenCompra
+    +LocalDate fecha
+  }
+  Proveedor "1" --> "*" Insumo : homologa
+  Insumo "1" --> "*" MovimientoKardex : kardex
+  OrdenProduccion "1" --> "*" SolicitudCotizacion : origina
+  SolicitudCotizacion "1" --> "*" CotizacionProveedor : recibe
+  Proveedor "1" --> "*" CotizacionProveedor : cotiza
+  CotizacionProveedor "1" --> "0..1" OrdenCompra : adjudica
+  OrdenCompra "1" -- "*" OrdenCompraDetalle : contiene
+  OrdenCompra "1" --> "*" MovimientoKardex : ingreso

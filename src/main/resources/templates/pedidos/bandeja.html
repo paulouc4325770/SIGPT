@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head(${titulo})}"></head>
+<body>
+<div th:replace="~{layout :: layout(~{::contenido})}"></div>
+
+<div th:fragment="contenido">
+  <h2 class="titulo-pantalla" th:text="${titulo}">Bandeja de Pedidos</h2>
+
+  <!-- Mensaje de confirmacion de la especificacion -->
+  <div class="alert alert-success" th:if="${mensajeExito}" th:text="${mensajeExito}">
+    Cliente registrado satisfactoriamente
+  </div>
+  <div class="alert alert-danger" th:if="${mensajeError}" th:text="${mensajeError}"></div>
+
+  <!-- Criterios de busqueda -->
+  <form class="row g-2 mb-3" method="get" th:action="@{/pedidos/bandeja}">
+    <div class="col-12 col-md-4">
+      <input type="text" class="form-control" name="codigo" placeholder="Codigo de pedido"
+             th:value="${filtroCodigo}">
+    </div>
+    <div class="col-12 col-md-4">
+      <select class="form-select" name="estado">
+        <option value="">Todos los estados</option>
+        <option value="REGISTRADO">Registrado</option>
+        <option value="COTIZADO">Cotizado</option>
+        <option value="EN_PRODUCCION">En Produccion</option>
+        <option value="TERMINADO">Terminado</option>
+        <option value="ANULADO">Anulado</option>
+      </select>
+    </div>
+    <div class="col-12 col-md-4 d-flex gap-2">
+      <button type="submit" class="btn btn-outline-primary flex-fill">Buscar</button>
+      <a class="btn btn-primary flex-fill" th:href="@{/pedidos/nuevo}">Nuevo Pedido</a>
+    </div>
+  </form>
+
+  <!-- Tablero semaforizado -->
+  <div class="row g-2 mb-3" th:if="${resumen != null}">
+    <div class="col-6 col-md-3">
+      <div class="tarjeta-kpi">
+        <p class="kpi-titulo">Registrados</p>
+        <p class="kpi-valor" th:text="${resumen.registrados}">0</p>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="tarjeta-kpi">
+        <p class="kpi-titulo">Cotizados</p>
+        <p class="kpi-valor" th:text="${resumen.cotizados}">0</p>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="tarjeta-kpi">
+        <p class="kpi-titulo">En produccion</p>
+        <p class="kpi-valor" th:text="${resumen.enProduccion}">0</p>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="tarjeta-kpi">
+        <p class="kpi-titulo">Terminados</p>
+        <p class="kpi-valor" th:text="${resumen.terminados}">0</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla de pedidos -->
+  <div class="card">
+    <div class="card-header">Pedidos registrados</div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+        <tr>
+          <th>Codigo</th>
+          <th>Cliente</th>
+          <th>Tipo de hilado</th>
+          <th>Gramaje</th>
+          <th>Pantone</th>
+          <th>Metros</th>
+          <th>Fecha de entrega</th>
+          <th>Estado</th>
+          <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="pedido : ${pedidos}">
+          <td th:text="${pedido.codPedido}">PED-2026-001</td>
+          <td th:text="${pedido.nombreCliente}">Cliente</td>
+          <td th:text="${pedido.tipoHilado}">Peinado 30/1</td>
+          <td th:text="${pedido.gramajeM2} + ' g/m²'">180 g/m²</td>
+          <td th:text="${pedido.colorPantone}">19-4023 TCX</td>
+          <td th:text="${pedido.metros}">3500</td>
+          <td th:text="${pedido.fechaEntrega}">2026-12-07</td>
+          <td>
+            <span class="badge" th:classappend="${pedido.estado == 'EN_PRODUCCION' ? 'bg-primary'
+                  : (pedido.estado == 'TERMINADO' ? 'bg-success'
+                  : (pedido.estado == 'ANULADO' ? 'bg-danger' : 'bg-secondary'))"
+                  th:text="${pedido.estado}">REGISTRADO</span>
+          </td>
+          <td class="text-end">
+            <a class="btn btn-sm btn-outline-primary"
+               th:href="@{'/pedidos/consultar/' + ${pedido.idPedido}}">Ver</a>
+          </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(pedidos)}">
+          <td colspan="9" class="text-center text-muted py-4">
+            No se encontraron datos para los criterios seleccionados.
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,11 @@
+stateDiagram-v2
+  [*] --> Registrado : EF-1001-3 paso 5 (metraje >= 1000 m)
+  Registrado --> Cotizado : se emite cotización (plazo de vigencia 15 días)
+  Cotizado --> EnProduccion : adelanto verificado >= 40 % (RD2)
+  Cotizado --> Anulado : expires la cotización (15 días)
+  Cotizado --> Anulado : el cliente no acepta
+  EnProduccion --> Terminado : 100 % de avance + calidad conforme (RD7/RD8)
+  Terminado --> Anulado : el cliente cancela antes del despacho
+  Registrado --> Anulado : pedido inviable y el cliente no acepta fecha diferida
+  Anulado --> [*]
+  Terminado --> [*]
