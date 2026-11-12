@@ -48,9 +48,7 @@
         <a class="btn btn-sm btn-outline-light" th:href="@{/seguridad/logout}">Cerrar sesion</a>
       </header>
 
-      <main class="contenido" th:replace="${contenido}">
-        <!-- Contenido de la pantalla -->
-      </main>
+      <main class="contenido" th:insert="${contenido}"></main>
     </div>
   </div>
 

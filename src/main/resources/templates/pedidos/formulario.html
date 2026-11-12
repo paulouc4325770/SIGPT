@@ -2,87 +2,87 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{layout :: head(${titulo})}"></head>
 <body>
-<div th:replace="~{layout :: layout(~{::contenido})}"></div>
+<div th:replace="~{layout :: layout(~{::contenido})}">
+  <div th:fragment="contenido">
+    <h2 class="titulo-pantalla">Nuevo Pedido Textil</h2>
 
-<div th:fragment="contenido">
-  <h2 class="titulo-pantalla">Nuevo Pedido Textil</h2>
+    <div class="alert alert-danger" th:if="${mensajeError}" th:text="${mensajeError}">
+      Metraje inferior a 1,000 m: el sistema impide guardar el pedido y muestra la alerta
+      correspondiente (Regla R1).
+    </div>
+    <div class="alert alert-success" th:if="${mensajeExito}" th:text="${mensajeExito}"></div>
 
-  <div class="alert alert-danger" th:if="${mensajeError}" th:text="${mensajeError}">
-    Metraje inferior a 1,000 m: el sistema impide guardar el pedido y muestra la alerta
-    correspondiente (Regla R1).
-  </div>
-  <div class="alert alert-success" th:if="${mensajeExito}" th:text="${mensajeExito}"></div>
+    <!-- Aviso de la especificacion: el pedido no avanza sin el 40% de adelanto -->
+    <div class="alert alert-warning">
+      Ninguna Orden de Produccion se emite a planta sin un adelanto minimo del 40% verificado
+      (Regla R2).
+    </div>
 
-  <!-- Aviso de la especificacion: el pedido no avanza sin el 40% de adelanto -->
-  <div class="alert alert-warning">
-    Ninguna Orden de Produccion se emite a planta sin un adelanto minimo del 40% verificado
-    (Regla R2).
-  </div>
+    <form th:action="@{/pedidos/guardar}" method="post" th:object="${pedido}">
+      <div class="card mb-3">
+        <div class="card-header">Ficha tecnica</div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-12 col-md-4">
+              <label class="form-label" for="idCliente">Cliente</label>
+              <select class="form-select" id="idCliente" th:field="*{idCliente}">
+                <option value="">Seleccione un cliente</option>
+                <option th:each="c : ${clientes}" th:value="${c.idCliente}"
+                        th:text="${c.razonSocial}">Cliente</option>
+              </select>
+            </div>
+            <div class="col-12 col-md-4">
+              <label class="form-label" for="tipoHilado">Tipo de hilado</label>
+              <input type="text" class="form-control" id="tipoHilado" name="tipoHilado"
+                     placeholder="Peinado 30/1" required>
+            </div>
+            <div class="col-12 col-md-4">
+              <label class="form-label" for="gramajeM2">Gramaje (g/m²)</label>
+              <input type="number" step="0.01" min="0" class="form-control" id="gramajeM2"
+                     name="gramajeM2" required>
+            </div>
 
-  <form th:action="@{/pedidos/guardar}" method="post" th:object="${pedido}">
-    <div class="card mb-3">
-      <div class="card-header">Ficha tecnica</div>
-      <div class="card-body">
-        <div class="row g-3">
-          <div class="col-12 col-md-4">
-            <label class="form-label" for="idCliente">Cliente</label>
-            <select class="form-select" id="idCliente" th:field="*{idCliente}">
-              <option value="">Seleccione un cliente</option>
-              <option th:each="c : ${clientes}" th:value="${c.idCliente}"
-                      th:text="${c.razonSocial}">Cliente</option>
-            </select>
-          </div>
-          <div class="col-12 col-md-4">
-            <label class="form-label" for="tipoHilado">Tipo de hilado</label>
-            <input type="text" class="form-control" id="tipoHilado" name="tipoHilado"
-                   placeholder="Peinado 30/1" required>
-          </div>
-          <div class="col-12 col-md-4">
-            <label class="form-label" for="gramajeM2">Gramaje (g/m²)</label>
-            <input type="number" step="0.01" min="0" class="form-control" id="gramajeM2"
-                   name="gramajeM2" required>
-          </div>
+            <div class="col-12 col-md-4">
+              <label class="form-label" for="colorPantone">Color (Pantone)</label>
+              <input type="text" class="form-control" id="colorPantone" name="colorPantone"
+                     placeholder="19-4023 TCX" required>
+            </div>
+            <div class="col-12 col-md-4">
+              <label class="form-label" for="composicion">Composicion de la mezcla</label>
+              <input type="text" class="form-control" id="composicion" name="composicion"
+                     placeholder="100% Algodon Pima" required>
+            </div>
+            <div class="col-12 col-md-4">
+              <label class="form-label" for="metros">Metros</label>
+              <input type="number" step="0.01" min="0" class="form-control" id="metros"
+                     th:field="*{metros}" required>
+              <div class="form-text">El metraje minimo de manufactura y tenido es de 1,000 m (RD1).</div>
+            </div>
 
-          <div class="col-12 col-md-4">
-            <label class="form-label" for="colorPantone">Color (Pantone)</label>
-            <input type="text" class="form-control" id="colorPantone" name="colorPantone"
-                   placeholder="19-4023 TCX" required>
-          </div>
-          <div class="col-12 col-md-4">
-            <label class="form-label" for="composicion">Composicion de la mezcla</label>
-            <input type="text" class="form-control" id="composicion" name="composicion"
-                   placeholder="100% Algodon Pima" required>
-          </div>
-          <div class="col-12 col-md-4">
-            <label class="form-label" for="metros">Metros</label>
-            <input type="number" step="0.01" min="0" class="form-control" id="metros"
-                   th:field="*{metros}" required>
-            <div class="form-text">El metraje minimo de manufactura y tenido es de 1,000 m (RD1).</div>
-          </div>
-
-          <div class="col-12 col-md-4">
-            <label class="form-label" for="toleranciaColor">Tolerancia de varianza de color (%)</label>
-            <input type="number" step="0.01" min="0" class="form-control" id="toleranciaColor"
-                   name="toleranciaColor">
-            <div class="form-text">Criterio de RD7: el Supervisor no aprueba lotes que la excedan.</div>
-          </div>
-          <div class="col-12 col-md-4">
-            <label class="form-label" for="fechaEntrega">Fecha de entrega</label>
-            <input type="date" class="form-control" id="fechaEntrega" th:field="*{fechaEntrega}">
-          </div>
-          <div class="col-12 col-md-4">
-            <label class="form-label" for="observaciones">Observaciones</label>
-            <input type="text" class="form-control" id="observaciones" name="observaciones">
+            <div class="col-12 col-md-4">
+              <label class="form-label" for="toleranciaColor">Tolerancia de varianza de color (%)</label>
+              <input type="number" step="0.01" min="0" class="form-control" id="toleranciaColor"
+                     name="toleranciaColor">
+              <div class="form-text">Criterio de RD7: el Supervisor no aprueba lotes que la excedan.</div>
+            </div>
+            <div class="col-12 col-md-4">
+              <label class="form-label" for="fechaEntrega">Fecha de entrega</label>
+              <input type="date" class="form-control" id="fechaEntrega" th:field="*{fechaEntrega}">
+            </div>
+            <div class="col-12 col-md-4">
+              <label class="form-label" for="observaciones">Observaciones</label>
+              <input type="text" class="form-control" id="observaciones" name="observaciones">
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="d-flex gap-2 justify-content-end">
-      <a class="btn btn-outline-secondary" th:href="@{/pedidos/bandeja}">Cancelar</a>
-      <button type="submit" class="btn btn-primary">Grabar</button>
-    </div>
-  </form>
+      <div class="d-flex gap-2 justify-content-end">
+        <a class="btn btn-outline-secondary" th:href="@{/pedidos/bandeja}">Cancelar</a>
+        <button type="submit" class="btn btn-primary">Grabar</button>
+      </div>
+    </form>
+  </div>
 </div>
 
 </body>

@@ -2,143 +2,143 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{layout :: head(${titulo})}"></head>
 <body>
-<div th:replace="~{layout :: layout(~{::contenido})}"></div>
+<div th:replace="~{layout :: layout(~{::contenido})}">
+  <div th:fragment="contenido">
+    <h2 class="titulo-pantalla">Insumos</h2>
 
-<div th:fragment="contenido">
-  <h2 class="titulo-pantalla">Insumos</h2>
+    <div class="alert alert-success" th:if="${mensajeExito}" th:text="${mensajeExito}"></div>
+    <div class="alert alert-danger" th:if="${mensajeError}" th:text="${mensajeError}"></div>
 
-  <div class="alert alert-success" th:if="${mensajeExito}" th:text="${mensajeExito}"></div>
-  <div class="alert alert-danger" th:if="${mensajeError}" th:text="${mensajeError}"></div>
-
-  <!-- Alerta de stock minimo (R-Stock) -->
-  <div class="alert alert-warning" th:if="${alertasStock != null and !alertasStock.isEmpty()}">
-    <strong>Insumos en stock minimo:</strong>
-    <span th:each="a : ${alertasStock}" th:text="${a.nombre + ' (' + a.stockActual + ' ' + a.unidadMedida + ')'}"
-          class="me-2">Insumo</span>
-  </div>
-
-  <div class="row g-3">
-    <!-- Formulario de registro de insumo -->
-    <div class="col-12 col-lg-5">
-      <div class="card">
-        <div class="card-header">Registro de insumo</div>
-        <div class="card-body">
-          <form th:action="@{/abastecimiento/insumos/guardar}" method="post" th:object="${insumo}"
-                enctype="multipart/form-data">
-            <div class="mb-3">
-              <label class="form-label" for="idProveedor">Proveedor</label>
-              <select class="form-select" id="idProveedor" th:field="*{idProveedor}">
-                <option value="">Codigo del proveedor homologado</option>
-                <option th:each="p : ${proveedores}" th:value="${p.idProveedor}"
-                        th:text="${p.codigo + ' - ' + p.razonSocial}">PRV-001</option>
-              </select>
-              <div class="form-text">Si el proveedor no existe, el sistema lo informa.</div>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label" for="nombre">Insumo</label>
-              <input type="text" class="form-control" id="nombre" th:field="*{nombre}"
-                     placeholder="Fibra, tinte, quimico, caja" required>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label" for="tipo">Tipo</label>
-              <select class="form-select" id="tipo" th:field="*{tipo}">
-                <option value="FIBRA">Fibra</option>
-                <option value="TINTE">Tinte</option>
-                <option value="QUIMICO">Quimico</option>
-                <option value="CAJA">Caja</option>
-              </select>
-            </div>
-
-            <div class="row g-2 mb-3">
-              <div class="col-6">
-                <label class="form-label" for="cantidad">Cantidad</label>
-                <input type="number" step="0.01" min="0" class="form-control" id="cantidad" required>
-              </div>
-              <div class="col-6">
-                <label class="form-label" for="unidadMedida">Unidad</label>
-                <select class="form-select" id="unidadMedida">
-                  <option value="KG">KG</option>
-                  <option value="L">L</option>
-                  <option value="UND">UND</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label" for="stockMinimo">Stock minimo</label>
-              <input type="number" step="0.01" min="0" class="form-control" id="stockMinimo"
-                     th:field="*{stockMinimo}">
-              <div class="form-text">Umbral de alerta de seguridad.</div>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label" for="archivoMsds">MSDS (adjuntar)</label>
-              <input type="file" class="form-control" id="archivoMsds" name="archivoMsds">
-              <div class="form-text">
-                Obligatorio para quimicos y tintes (Regla R5 / RD5). En la base de datos se guarda
-                solo la ruta del archivo.
-              </div>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label" for="estado">Estado</label>
-              <select class="form-select" id="estado" th:field="*{estado}">
-                <option value="ACTIVO">Activo</option>
-                <option value="INACTIVO">Inactivo</option>
-              </select>
-            </div>
-
-            <div class="d-flex gap-2 justify-content-end">
-              <button type="reset" class="btn btn-outline-secondary">Cancelar</button>
-              <button type="submit" class="btn btn-primary">Grabar</button>
-            </div>
-          </form>
-        </div>
-      </div>
+    <!-- Alerta de stock minimo (R-Stock) -->
+    <div class="alert alert-warning" th:if="${alertasStock != null and !alertasStock.isEmpty()}">
+      <strong>Insumos en stock minimo:</strong>
+      <span th:each="a : ${alertasStock}" th:text="${a.nombre + ' (' + a.stockActual + ' ' + a.unidadMedida + ')'}"
+            class="me-2">Insumo</span>
     </div>
 
-    <!-- Listado -->
-    <div class="col-12 col-lg-7">
-      <div class="card">
-        <div class="card-header">Insumos registrados</div>
-        <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
-            <thead>
-            <tr>
-              <th>Codigo</th>
-              <th>Insumo</th>
-              <th>Tipo</th>
-              <th>Stock</th>
-              <th>Minimo</th>
-              <th>MSDS</th>
-              <th>Estado</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="i : ${insumos}">
-              <td th:text="${i.codigo}">INS-001</td>
-              <td th:text="${i.nombre}">Insumo</td>
-              <td th:text="${i.tipo}">FIBRA</td>
-              <td th:text="${i.stockActual} + ' ' + ${i.unidadMedida}">0 KG</td>
-              <td th:text="${i.stockMinimo}">0</td>
-              <td>
-                <span class="badge" th:classappend="${i.rutaMsds != null ? 'bg-success' : 'bg-danger'}"
-                      th:text="${i.rutaMsds != null} ? 'Si' : 'No'">Si</span>
-              </td>
-              <td>
-                <span class="badge" th:classappend="${i.estado == 'ACTIVO' ? 'bg-success' : 'bg-secondary'}"
-                      th:text="${i.estado}">ACTIVO</span>
-              </td>
-            </tr>
-            <tr th:if="${#lists.isEmpty(insumos)}">
-              <td colspan="7" class="text-center text-muted py-4">
-                No se encontraron datos para los criterios seleccionados.
-              </td>
-            </tr>
-            </tbody>
-          </table>
+    <div class="row g-3">
+      <!-- Formulario de registro de insumo -->
+      <div class="col-12 col-lg-5">
+        <div class="card">
+          <div class="card-header">Registro de insumo</div>
+          <div class="card-body">
+            <form th:action="@{/abastecimiento/insumos/guardar}" method="post" th:object="${insumo}"
+                  enctype="multipart/form-data">
+              <div class="mb-3">
+                <label class="form-label" for="idProveedor">Proveedor</label>
+                <select class="form-select" id="idProveedor" th:field="*{idProveedor}">
+                  <option value="">Codigo del proveedor homologado</option>
+                  <option th:each="p : ${proveedores}" th:value="${p.idProveedor}"
+                          th:text="${p.codigo + ' - ' + p.razonSocial}">PRV-001</option>
+                </select>
+                <div class="form-text">Si el proveedor no existe, el sistema lo informa.</div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label" for="nombre">Insumo</label>
+                <input type="text" class="form-control" id="nombre" th:field="*{nombre}"
+                       placeholder="Fibra, tinte, quimico, caja" required>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label" for="tipo">Tipo</label>
+                <select class="form-select" id="tipo" th:field="*{tipo}">
+                  <option value="FIBRA">Fibra</option>
+                  <option value="TINTE">Tinte</option>
+                  <option value="QUIMICO">Quimico</option>
+                  <option value="CAJA">Caja</option>
+                </select>
+              </div>
+
+              <div class="row g-2 mb-3">
+                <div class="col-6">
+                  <label class="form-label" for="cantidad">Cantidad</label>
+                  <input type="number" step="0.01" min="0" class="form-control" id="cantidad" required>
+                </div>
+                <div class="col-6">
+                  <label class="form-label" for="unidadMedida">Unidad</label>
+                  <select class="form-select" id="unidadMedida">
+                    <option value="KG">KG</option>
+                    <option value="L">L</option>
+                    <option value="UND">UND</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label" for="stockMinimo">Stock minimo</label>
+                <input type="number" step="0.01" min="0" class="form-control" id="stockMinimo"
+                       th:field="*{stockMinimo}">
+                <div class="form-text">Umbral de alerta de seguridad.</div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label" for="archivoMsds">MSDS (adjuntar)</label>
+                <input type="file" class="form-control" id="archivoMsds" name="archivoMsds">
+                <div class="form-text">
+                  Obligatorio para quimicos y tintes (Regla R5 / RD5). En la base de datos se guarda
+                  solo la ruta del archivo.
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label" for="estado">Estado</label>
+                <select class="form-select" id="estado" th:field="*{estado}">
+                  <option value="ACTIVO">Activo</option>
+                  <option value="INACTIVO">Inactivo</option>
+                </select>
+              </div>
+
+              <div class="d-flex gap-2 justify-content-end">
+                <button type="reset" class="btn btn-outline-secondary">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Grabar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Listado -->
+      <div class="col-12 col-lg-7">
+        <div class="card">
+          <div class="card-header">Insumos registrados</div>
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+              <tr>
+                <th>Codigo</th>
+                <th>Insumo</th>
+                <th>Tipo</th>
+                <th>Stock</th>
+                <th>Minimo</th>
+                <th>MSDS</th>
+                <th>Estado</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr th:each="i : ${insumos}">
+                <td th:text="${i.codigo}">INS-001</td>
+                <td th:text="${i.nombre}">Insumo</td>
+                <td th:text="${i.tipo}">FIBRA</td>
+                <td th:text="${i.stockActual} + ' ' + ${i.unidadMedida}">0 KG</td>
+                <td th:text="${i.stockMinimo}">0</td>
+                <td>
+                  <span class="badge" th:classappend="${i.rutaMsds != null ? 'bg-success' : 'bg-danger'}"
+                        th:text="${i.rutaMsds != null} ? 'Si' : 'No'">Si</span>
+                </td>
+                <td>
+                  <span class="badge" th:classappend="${i.estado == 'ACTIVO' ? 'bg-success' : 'bg-secondary'}"
+                        th:text="${i.estado}">ACTIVO</span>
+                </td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(insumos)}">
+                <td colspan="7" class="text-center text-muted py-4">
+                  No se encontraron datos para los criterios seleccionados.
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

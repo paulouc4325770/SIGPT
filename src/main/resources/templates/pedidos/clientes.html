@@ -2,119 +2,119 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{layout :: head(${titulo})}"></head>
 <body>
-<div th:replace="~{layout :: layout(~{::contenido})}"></div>
+<div th:replace="~{layout :: layout(~{::contenido})}">
+  <div th:fragment="contenido">
+    <h2 class="titulo-pantalla">Bandeja de Clientes</h2>
 
-<div th:fragment="contenido">
-  <h2 class="titulo-pantalla">Bandeja de Clientes</h2>
+    <div class="alert alert-success" th:if="${mensajeExito}" th:text="${mensajeExito}">
+      Cliente registrado satisfactoriamente
+    </div>
+    <div class="alert alert-danger" th:if="${mensajeError}" th:text="${mensajeError}"></div>
 
-  <div class="alert alert-success" th:if="${mensajeExito}" th:text="${mensajeExito}">
-    Cliente registrado satisfactoriamente
-  </div>
-  <div class="alert alert-danger" th:if="${mensajeError}" th:text="${mensajeError}"></div>
+    <div class="d-flex gap-2 mb-3">
+      <form class="flex-fill d-flex gap-2" method="get" th:action="@{/pedidos/clientes}">
+        <input type="text" class="form-control" name="busqueda" placeholder="Razon social o RUC / Tax ID"
+               th:value="${busqueda}">
+        <button type="submit" class="btn btn-outline-primary">Buscar</button>
+      </form>
+      <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
+              data-bs-target="#formularioCliente">Agregar
+      </button>
+    </div>
 
-  <div class="d-flex gap-2 mb-3">
-    <form class="flex-fill d-flex gap-2" method="get" th:action="@{/pedidos/clientes}">
-      <input type="text" class="form-control" name="busqueda" placeholder="Razon social o RUC / Tax ID"
-             th:value="${busqueda}">
-      <button type="submit" class="btn btn-outline-primary">Buscar</button>
-    </form>
-    <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
-            data-bs-target="#formularioCliente">Agregar
-    </button>
-  </div>
-
-  <!-- Formulario de alta / edicion (misma pantalla, como en el prototipo) -->
-  <div class="collapse mb-3" id="formularioCliente">
-    <div class="card">
-      <div class="card-header" th:text="${clienteSeleccionado != null} ? 'Editar cliente' : 'Registrar cliente'">
-        Registrar cliente
-      </div>
-      <div class="card-body">
-        <form th:action="@{/pedidos/clientes/guardar}" method="post" th:object="${cliente}">
-          <div class="row g-3">
-            <div class="col-12 col-md-4">
-              <label class="form-label" for="razonSocial">Razon social</label>
-              <input type="text" class="form-control" id="razonSocial" th:field="*{razonSocial}" required>
+    <!-- Formulario de alta / edicion (misma pantalla, como en el prototipo) -->
+    <div class="collapse mb-3" id="formularioCliente">
+      <div class="card">
+        <div class="card-header" th:text="${clienteSeleccionado != null} ? 'Editar cliente' : 'Registrar cliente'">
+          Registrar cliente
+        </div>
+        <div class="card-body">
+          <form th:action="@{/pedidos/clientes/guardar}" method="post" th:object="${cliente}">
+            <div class="row g-3">
+              <div class="col-12 col-md-4">
+                <label class="form-label" for="razonSocial">Razon social</label>
+                <input type="text" class="form-control" id="razonSocial" th:field="*{razonSocial}" required>
+              </div>
+              <div class="col-12 col-md-4">
+                <label class="form-label" for="rucTaxId">RUC / Tax ID</label>
+                <input type="text" class="form-control" id="rucTaxId" th:field="*{rucTaxId}" required>
+                <div class="form-text">No puede estar duplicado.</div>
+              </div>
+              <div class="col-12 col-md-4">
+                <label class="form-label" for="pais">Pais</label>
+                <input type="text" class="form-control" id="pais" th:field="*{pais}" required>
+              </div>
+              <div class="col-12 col-md-4">
+                <label class="form-label" for="contacto">Contacto</label>
+                <input type="text" class="form-control" id="contacto" th:field="*{contacto}">
+              </div>
+              <div class="col-12 col-md-4">
+                <label class="form-label" for="correo">Correo</label>
+                <input type="email" class="form-control" id="correo" th:field="*{correo}">
+              </div>
+              <div class="col-12 col-md-4">
+                <label class="form-label" for="telefono">Telefono</label>
+                <input type="text" class="form-control" id="telefono" th:field="*{telefono}">
+              </div>
+              <div class="col-12 col-md-4">
+                <label class="form-label" for="estado">Estado</label>
+                <select class="form-select" id="estado" th:field="*{estado}">
+                  <option value="ACTIVO">Activo</option>
+                  <option value="INACTIVO">Inactivo</option>
+                </select>
+              </div>
             </div>
-            <div class="col-12 col-md-4">
-              <label class="form-label" for="rucTaxId">RUC / Tax ID</label>
-              <input type="text" class="form-control" id="rucTaxId" th:field="*{rucTaxId}" required>
-              <div class="form-text">No puede estar duplicado.</div>
+            <div class="d-flex gap-2 justify-content-end mt-3">
+              <button type="button" class="btn btn-outline-secondary"
+                      data-bs-toggle="collapse" data-bs-target="#formularioCliente">Cancelar
+              </button>
+              <button type="submit" class="btn btn-primary">Grabar</button>
             </div>
-            <div class="col-12 col-md-4">
-              <label class="form-label" for="pais">Pais</label>
-              <input type="text" class="form-control" id="pais" th:field="*{pais}" required>
-            </div>
-            <div class="col-12 col-md-4">
-              <label class="form-label" for="contacto">Contacto</label>
-              <input type="text" class="form-control" id="contacto" th:field="*{contacto}">
-            </div>
-            <div class="col-12 col-md-4">
-              <label class="form-label" for="correo">Correo</label>
-              <input type="email" class="form-control" id="correo" th:field="*{correo}">
-            </div>
-            <div class="col-12 col-md-4">
-              <label class="form-label" for="telefono">Telefono</label>
-              <input type="text" class="form-control" id="telefono" th:field="*{telefono}">
-            </div>
-            <div class="col-12 col-md-4">
-              <label class="form-label" for="estado">Estado</label>
-              <select class="form-select" id="estado" th:field="*{estado}">
-                <option value="ACTIVO">Activo</option>
-                <option value="INACTIVO">Inactivo</option>
-              </select>
-            </div>
-          </div>
-          <div class="d-flex gap-2 justify-content-end mt-3">
-            <button type="button" class="btn btn-outline-secondary"
-                    data-bs-toggle="collapse" data-bs-target="#formularioCliente">Cancelar
-            </button>
-            <button type="submit" class="btn btn-primary">Grabar</button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="card">
-    <div class="table-responsive">
-      <table class="table table-hover align-middle mb-0">
-        <thead>
-        <tr>
-          <th>Codigo</th>
-          <th>Razon social</th>
-          <th>RUC / Tax ID</th>
-          <th>Pais</th>
-          <th>Contacto</th>
-          <th>Correo / Telefono</th>
-          <th>Estado</th>
-          <th></th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="c : ${clientes}">
-          <td th:text="${c.codigo}">CLI-001</td>
-          <td th:text="${c.razonSocial}">Marca</td>
-          <td th:text="${c.rucTaxId}">20100011122</td>
-          <td th:text="${c.pais}">Peru</td>
-          <td th:text="${c.contacto}">Contacto</td>
-          <td th:text="${c.correo} + ' / ' + ${c.telefono}">correo</td>
-          <td>
-            <span class="badge" th:classappend="${c.estado == 'ACTIVO' ? 'bg-success' : 'bg-secondary'}"
-                  th:text="${c.estado}">ACTIVO</span>
-          </td>
-          <td class="text-end">
-            <a class="btn btn-sm btn-outline-primary"
-               th:href="@{'/pedidos/clientes/editar/' + ${c.idCliente}}">Editar</a>
-          </td>
-        </tr>
-        <tr th:if="${#lists.isEmpty(clientes)}">
-          <td colspan="8" class="text-center text-muted py-4">
-            No se encontraron datos para los criterios seleccionados.
-          </td>
-        </tr>
-        </tbody>
-      </table>
+    <div class="card">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+          <tr>
+            <th>Codigo</th>
+            <th>Razon social</th>
+            <th>RUC / Tax ID</th>
+            <th>Pais</th>
+            <th>Contacto</th>
+            <th>Correo / Telefono</th>
+            <th>Estado</th>
+            <th></th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="c : ${clientes}">
+            <td th:text="${c.codigo}">CLI-001</td>
+            <td th:text="${c.razonSocial}">Marca</td>
+            <td th:text="${c.rucTaxId}">20100011122</td>
+            <td th:text="${c.pais}">Peru</td>
+            <td th:text="${c.contacto}">Contacto</td>
+            <td th:text="${c.correo} + ' / ' + ${c.telefono}">correo</td>
+            <td>
+              <span class="badge" th:classappend="${c.estado == 'ACTIVO' ? 'bg-success' : 'bg-secondary'}"
+                    th:text="${c.estado}">ACTIVO</span>
+            </td>
+            <td class="text-end">
+              <a class="btn btn-sm btn-outline-primary"
+                 th:href="@{'/pedidos/clientes/editar/' + ${c.idCliente}}">Editar</a>
+            </td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(clientes)}">
+            <td colspan="8" class="text-center text-muted py-4">
+              No se encontraron datos para los criterios seleccionados.
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>

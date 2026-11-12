@@ -1,5 +1,6 @@
 package com.textilesandinos.sigpt.presentacion;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -11,6 +12,7 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -56,6 +58,62 @@ class PruebasPlantillasTest {
         mockMvc.perform(get("/prueba-plantilla/" + nombre).session(sesionConPermiso(nombre)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith("text/html"));
+    }
+
+    /**
+     * Cada pantalla debe pintarse una sola vez.
+     *
+     * <p>Regresion: el fragmento {@code contenido} era hermano del elemento
+     * reemplazado por el layout, de modo que Thymeleaf lo insertaba dentro del
+     * layout y ademas lo repintaba en su posicion original: todas las pantallas
+     * salian duplicadas.
+     */
+    @ParameterizedTest(name = "la plantilla {0} no se repite el contenido")
+    @CsvSource({
+            "seguridad/login,        Ingresar",
+            "inicio,                 titulo-pantalla",
+            "error/error,            codigo-error",
+            "pedidos/bandeja,        titulo-pantalla",
+            "pedidos/formulario,     titulo-pantalla",
+            "pedidos/clientes,       titulo-pantalla",
+            "abastecimiento/insumos, titulo-pantalla",
+            "planta/asignacion,      titulo-pantalla",
+            "planta/avance,          titulo-pantalla",
+            "reportes/formulario,    titulo-pantalla"
+    })
+    void renderizaPlantillaUnaSolaVez(String nombre, String marcador) throws Exception {
+        String html = mockMvc.perform(get("/prueba-plantilla/" + nombre)
+                        .session(sesionConPermiso(nombre)))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        assertThat(html).contains(marcador);
+        assertThat(contar(html, marcador))
+                .as("la plantilla %s debe contener el marcador '%s' una sola vez", nombre, marcador)
+                .isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("el menu lateral se monta una sola vez en la pagina")
+    void menuLateralNoSeRepite() throws Exception {
+        String html = mockMvc.perform(get("/prueba-plantilla/inicio")
+                        .session(sesionConPermiso("inicio")))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        assertThat(contar(html, "sidebar-menu")).isEqualTo(1);
+        assertThat(contar(html, "contenedor-principal")).isEqualTo(1);
+    }
+
+    /** Cuenta apariciones no solapadas de un texto. */
+    private int contar(String texto, String fragmento) {
+        int total = 0;
+        int indice = texto.indexOf(fragmento);
+        while (indice >= 0) {
+            total++;
+            indice = texto.indexOf(fragmento, indice + fragmento.length());
+        }
+        return total;
     }
 
     @Test

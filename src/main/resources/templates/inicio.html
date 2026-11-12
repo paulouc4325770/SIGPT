@@ -2,46 +2,46 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{layout :: head(${titulo})}"></head>
 <body>
-<div th:replace="~{layout :: layout(~{::contenido})}"></div>
+<div th:replace="~{layout :: layout(~{::contenido})}">
+  <div th:fragment="contenido">
+    <h2 class="titulo-pantalla" th:text="${titulo}">Inicio</h2>
 
-<div th:fragment="contenido">
-  <h2 class="titulo-pantalla" th:text="${titulo}">Inicio</h2>
-
-  <div class="row g-3">
-    <div class="col-12 col-md-4">
-      <div class="tarjeta-kpi">
-        <p class="kpi-titulo">Perfil activo</p>
-        <p class="kpi-valor" th:text="${usuarioActual.perfil.nombrePerfil}">Perfil</p>
-        <p class="kpi-detalle" th:text="${usuarioActual.area}">Area</p>
+    <div class="row g-3">
+      <div class="col-12 col-md-4">
+        <div class="tarjeta-kpi">
+          <p class="kpi-titulo">Perfil activo</p>
+          <p class="kpi-valor" th:text="${usuarioActual.perfil.nombrePerfil}">Perfil</p>
+          <p class="kpi-detalle" th:text="${usuarioActual.area}">Area</p>
+        </div>
+      </div>
+      <div class="col-12 col-md-4">
+        <div class="tarjeta-kpi">
+          <p class="kpi-titulo">Opciones de menu</p>
+          <p class="kpi-valor" th:text="${#lists.size(menu)}">0</p>
+          <p class="kpi-detalle">Definidas por su perfil</p>
+        </div>
+      </div>
+      <div class="col-12 col-md-4">
+        <div class="tarjeta-kpi">
+          <p class="kpi-titulo">Sesion</p>
+          <p class="kpi-valor">15 min</p>
+          <p class="kpi-detalle">Cierre por inactividad</p>
+        </div>
       </div>
     </div>
-    <div class="col-12 col-md-4">
-      <div class="tarjeta-kpi">
-        <p class="kpi-titulo">Opciones de menu</p>
-        <p class="kpi-valor" th:text="${#lists.size(menu)}">0</p>
-        <p class="kpi-detalle">Definidas por su perfil</p>
-      </div>
-    </div>
-    <div class="col-12 col-md-4">
-      <div class="tarjeta-kpi">
-        <p class="kpi-titulo">Sesion</p>
-        <p class="kpi-valor">15 min</p>
-        <p class="kpi-detalle">Cierre por inactividad</p>
-      </div>
-    </div>
-  </div>
 
-  <div class="mt-4">
-    <h5 class="mb-3">Accesos disponibles</h5>
-    <div class="row g-2">
-      <div class="col-12 col-md-6" th:each="grupo : ${menu}">
-        <div class="tarjeta-grupo">
-          <p class="menu-title" th:text="${grupo.key}">Grupo</p>
-          <ul class="list-unstyled mb-0">
-            <li th:each="opcion : ${grupo.value}">
-              <a th:href="@{${opcion.urlOpcion}}" th:text="${opcion.nombreOpcion}">Opcion</a>
-            </li>
-          </ul>
+    <div class="mt-4">
+      <h5 class="mb-3">Accesos disponibles</h5>
+      <div class="row g-2">
+        <div class="col-12 col-md-6" th:each="grupo : ${menu}">
+          <div class="tarjeta-grupo">
+            <p class="menu-title" th:text="${grupo.key}">Grupo</p>
+            <ul class="list-unstyled mb-0">
+              <li th:each="opcion : ${grupo.value}">
+                <a th:href="@{${opcion.urlOpcion}}" th:text="${opcion.nombreOpcion}">Opcion</a>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
