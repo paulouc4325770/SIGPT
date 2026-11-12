@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Error')}"></head>
+<body>
+<div th:replace="~{layout :: layout(~{::contenido})}"></div>
+
+<div th:fragment="contenido">
+  <div class="tarjeta-error">
+    <p class="codigo-error" th:text="${codigoError}">500</p>
+    <p class="mensaje-error" th:text="${mensajeError}">Ocurrio un error inesperado.</p>
+    <a class="btn btn-primary" th:href="@{/inicio}">Volver al inicio</a>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${titulo} + ' - SIGPT'">SIGPT</title>
+  <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+  <link rel="stylesheet" th:href="@{/css/sigpt.css}">
+</head>
+<body>
+
+<!-- ================= Layout de acceso (pantalla de login) ================= -->
+<div th:fragment="layout(contenido)" class="pantalla-login">
+  <div class="tarjeta-login">
+    <div class="login-cabecera">
+      <h1 class="marca">SIGPT</h1>
+      <p class="subtitulo">Sistema Integral de Gestion de Produccion Textil</p>
+      <p class="empresa">Textiles Andinos S.A.C.</p>
+    </div>
+    <div th:replace="${contenido}"></div>
+  </div>
+  <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</div>
+
+</body>
+</html>

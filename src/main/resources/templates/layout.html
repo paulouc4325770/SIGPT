@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(titulo)">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${titulo} + ' - SIGPT'">SIGPT</title>
+  <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+  <link rel="stylesheet" th:href="@{/css/sigpt.css}">
+</head>
+<body>
+
+<!-- ================= Layout principal (oficina y planta) ================= -->
+<div th:fragment="layout(contenido)">
+
+  <div class="d-flex">
+    <!-- ---------------- Menu lateral (armado desde la BD por perfil) ---------------- -->
+    <aside class="sidebar" th:if="${usuarioActual != null}">
+      <div class="sidebar-brand">
+        <span class="brand">SIGPT</span>
+        <span class="brand-sub" th:text="${nombreAplicacion}">Textiles Andinos</span>
+      </div>
+
+      <nav class="sidebar-menu">
+        <div th:each="grupo : ${menu}" class="menu-group">
+          <p class="menu-title" th:text="${grupo.key}">Grupo</p>
+          <ul class="nav flex-column">
+            <li class="nav-item" th:each="opcion : ${grupo.value}">
+              <a class="nav-link" th:href="@{${opcion.urlOpcion}}" th:text="${opcion.nombreOpcion}">
+                Opcion
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- ---------------- Contenido ---------------- -->
+    <div class="contenedor-principal">
+      <header class="barra-superior">
+        <div class="usuario-info">
+          <span class="usuario-nombre" th:if="${usuarioActual != null}"
+                th:text="${usuarioActual.nombres}">Usuario</span>
+          <span class="usuario-rol badge" th:if="${usuarioActual != null and usuarioActual.perfil != null}"
+                th:text="${usuarioActual.perfil.nombrePerfil}">Perfil</span>
+          <span class="usuario-area small" th:if="${usuarioActual != null}"
+                th:text="${usuarioActual.area}">Area</span>
+        </div>
+        <a class="btn btn-sm btn-outline-light" th:href="@{/seguridad/logout}">Cerrar sesion</a>
+      </header>
+
+      <main class="contenido" th:replace="${contenido}">
+        <!-- Contenido de la pantalla -->
+      </main>
+    </div>
+  </div>
+
+  <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</div>
+
+</body>
+</html>

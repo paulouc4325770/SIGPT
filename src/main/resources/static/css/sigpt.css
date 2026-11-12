@@ -1,0 +1,264 @@
+/* ============================================================================
+   SIGPT - Hoja de estilos propia
+   Bootstrap 5 cubre la base; aqui solo se personaliza la identidad del sistema.
+   ========================================================================== */
+
+:root {
+    --sigpt-azul: #1e3a5f;
+    --sigpt-azul-claro: #2c5282;
+    --sigpt-fondo: #f4f6f9;
+    --sigpt-borde: #dfe4ea;
+}
+
+/* ---------- Pantalla de acceso ---------- */
+.pantalla-login {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--sigpt-azul) 0%, var(--sigpt-azul-claro) 100%);
+    padding: 1rem;
+}
+
+.tarjeta-login {
+    width: 100%;
+    max-width: 420px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, .25);
+    padding: 2rem 2rem 1.25rem;
+}
+
+.login-cabecera {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.login-cabecera .marca {
+    font-size: 2.25rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    color: var(--sigpt-azul);
+    margin: 0;
+}
+
+.login-cabecera .subtitulo {
+    font-size: .85rem;
+    color: #5a6b7d;
+    margin: .25rem 0 0;
+}
+
+.login-cabecera .empresa {
+    font-size: .75rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: #94a3b8;
+    margin: .15rem 0 0;
+}
+
+.pie-login {
+    margin-top: 1.25rem;
+    padding-top: .75rem;
+    border-top: 1px solid var(--sigpt-borde);
+    color: #7b8794;
+    text-align: center;
+}
+
+.pie-login p {
+    margin: 0;
+}
+
+/* ---------- Menu lateral ---------- */
+.sidebar {
+    width: 260px;
+    min-width: 260px;
+    background: var(--sigpt-azul);
+    color: #dbe4ef;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-brand {
+    padding: 1.25rem 1.25rem .9rem;
+    border-bottom: 1px solid rgba(255, 255, 255, .12);
+}
+
+.sidebar-brand .brand {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    color: #fff;
+}
+
+.sidebar-brand .brand-sub {
+    font-size: .7rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: #9fb3c8;
+}
+
+.sidebar-menu {
+    padding: .75rem 0;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.menu-group {
+    margin-bottom: .25rem;
+}
+
+.menu-title {
+    font-size: .68rem;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: #8fa6bd;
+    padding: .9rem 1.25rem .35rem;
+    margin: 0;
+}
+
+.sidebar-menu .nav-link {
+    color: #cddaE8;
+    padding: .5rem 1.25rem;
+    font-size: .9rem;
+    text-decoration: none;
+}
+
+.sidebar-menu .nav-link:hover {
+    background: rgba(255, 255, 255, .08);
+    color: #fff;
+}
+
+/* ---------- Contenido ---------- */
+.contenedor-principal {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.barra-superior {
+    background: var(--sigpt-azul-claro);
+    color: #fff;
+    padding: .6rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.usuario-info {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+}
+
+.usuario-nombre {
+    font-weight: 600;
+}
+
+.usuario-area {
+    opacity: .8;
+}
+
+.contenido {
+    padding: 1.5rem;
+    flex: 1;
+    background: var(--sigpt-fondo);
+}
+
+.titulo-pantalla {
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: var(--sigpt-azul);
+    margin-bottom: 1.25rem;
+}
+
+/* ---------- Tarjetas de indicador ---------- */
+.tarjeta-kpi {
+    background: #fff;
+    border: 1px solid var(--sigpt-borde);
+    border-radius: 10px;
+    padding: 1.1rem 1.25rem;
+    height: 100%;
+}
+
+.tarjeta-kpi .kpi-titulo {
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: #7b8794;
+    margin: 0;
+}
+
+.tarjeta-kpi .kpi-valor {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--sigpt-azul);
+    margin: .3rem 0;
+}
+
+.tarjeta-kpi .kpi-detalle {
+    font-size: .8rem;
+    color: #94a3b8;
+    margin: 0;
+}
+
+.tarjeta-grupo {
+    background: #fff;
+    border: 1px solid var(--sigpt-borde);
+    border-radius: 10px;
+    padding: .75rem 1.1rem 1rem;
+}
+
+.tarjeta-grupo .menu-title {
+    color: var(--sigpt-azul);
+    padding: .35rem 0;
+}
+
+.tarjeta-grupo a {
+    color: var(--sigpt-azul-claro);
+    text-decoration: none;
+    font-size: .9rem;
+}
+
+.tarjeta-grupo a:hover {
+    text-decoration: underline;
+}
+
+/* ---------- Error ---------- */
+.tarjeta-error {
+    background: #fff;
+    border: 1px solid var(--sigpt-borde);
+    border-radius: 10px;
+    padding: 2.5rem;
+    text-align: center;
+    max-width: 560px;
+    margin: 2rem auto;
+}
+
+.tarjeta-error .codigo-error {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--sigpt-azul);
+    margin: 0;
+}
+
+.tarjeta-error .mensaje-error {
+    color: #5a6b7d;
+    margin: .5rem 0 1.5rem;
+}
+
+/* ---------- Terminal de planta (pantallas tactiles) ---------- */
+.modo-planta .form-control,
+.modo-planta .form-select {
+    font-size: 1.2rem;
+    padding: .9rem 1rem;
+    min-height: 56px;
+}
+
+.modo-planta .btn {
+    font-size: 1.15rem;
+    padding: .9rem 1.4rem;
+    min-height: 56px;
+}

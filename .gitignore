@@ -1,0 +1,45 @@
+# ---- Compilacion y herramientas ----
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# ---- IDE ----
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.project
+.classpath
+nbproject/private/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# ---- Secretos: RDS5 / OWASP A02 - NUNCA versionar ----
+/application-local.properties
+src/main/resources/application-local.properties
+src/main/resources/application-local.yml
+*.local.properties
+*.local.yml
+.env
+.env.*
+secrets.properties
+
+# ---- Logs ----
+*.log
+logs/
+
+# ---- Sistema operativo ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- Datos de prueba y temporales ----
+tmp/
+temp/
+*.tmp
+*.bak
+*.orig
