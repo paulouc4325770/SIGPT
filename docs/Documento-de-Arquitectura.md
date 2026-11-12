@@ -1380,6 +1380,10 @@ Workflow en cada PR: `mvn -B verify` (compila + unitarias + integración) → an
 | **CHG‑05** | Declarar el **despacho y la exportación fuera del alcance** de esta fase; el pedido cierra en estado Terminado | **Aprobada** (D‑P4) | Sin `guia_despacho` ni `contenedor`; sin transición `Terminado → Despachado` |
 | **CHG‑06** | Declarar que la entrega es **solo MVC**, sin Web API (la API queda para integraciones futuras) | **Aprobada** (D‑P3) | Sin proyecto adicional ni contrato HTTP; coherente con D5, D7 y §11 |
 
+| **CHG-07** | La exportacion de pedidos se entrega en **CSV y Excel (formato HTML)** en lugar de PDF y XLSX nativo | **Aprobada** (D-P8) | Se evita sumar dependencias binarias (OpenPDF, Apache POI); el PDF se resuelve en el entregable 3, donde ya hace falta para la orden de compra |
+| **CHG-08** | Las acciones de una pantalla (guardar, consultar, anular, exportar) se autorizan como **subrutas de la opcion de menu** correspondiente | **Aprobada** (D-P9) | El filtro de permisos acepta la ruta exacta de la opcion y sus subrutas; sin esto ninguna accion POST seria accesible |
+| **CHG-09** | **Todas las operaciones de E2 dejan traza** en `registro_auditoria` (modulos PEDIDOS y PLANTA) | **Aprobada** (D-P10) | `AuditoriaHelper` en cada LN; evidencia directa de OWASP A09 y de RC8 |
+
 > Todas las solicitudes se registran en el tablero de seguimiento (GC‑1005, etapa 1) y las aprobadas se anexan al documento de requisitos en la próxima versión (F2 p.36, EF‑1001‑15).
 
 ### 12.2 Inconsistencias entre los documentos base
@@ -1398,7 +1402,7 @@ Workflow en cada PR: `mvn -B verify` (compila + unitarias + integración) → an
 | 10 | Títulos de casos de uso difieren entre F1 y F2 ("Registrar Pedido Textil" vs. "Gestionar Pedido Textil"; "Registrar Clientes" vs. "Gestionar Clientes") | Unificar el título en F2 (cambio editorial) |
 | 11 | La numeración EF tiene huecos (no existe EF‑1001‑11) y duplica el 5 | Renumerar en la próxima versión del documento de requisitos |
 
-### 12.3 Decisiones tomadas (cerradas el 12/11/2026)
+### 12.3 Decisiones tomadas (cerradas el 12/11/2026, ampliadas en E2)
 
 | Id | Decisión | Resolución | Consecuencia en el diseño |
 |---|---|---|---|
@@ -1409,6 +1413,10 @@ Workflow en cada PR: `mvn -B verify` (compila + unitarias + integración) → an
 | **D‑P5** | Tipo de cambio y moneda | **Sí, con tabla `tipo_cambio`** | CHG‑02; da sentido al "valor pactado" del 40 % (RD2) |
 | **D‑P6** | Puntaje "Experiencia del equipo" | **Se deja 4 y se anota como supuesto** | La matriz de plataforma (4.30 vs 2.75) no cambia; se declara el supuesto en la sustentación |
 | **D‑P7** | Gestión de las decisiones del profesor | **Se asumen las opciones recomendadas y se avanza** | No se requiere consulta previa; las desviaciones quedan registradas como CHG‑01..CHG‑06 (§12.1) |
+
+| **D-P8** | Formato de exportacion de pedidos | **CSV y Excel (HTML)**; el PDF pasa a E3 | CHG-07; `ExportadorTabla` sin dependencias externas |
+| **D-P9** | Permisos de las acciones de pantalla | **Subruta de la opcion de menu** | CHG-08; `MenuHelper.tieneAcceso` acepta la ruta y sus subrutas |
+| **D-P10** | Auditoria de las operaciones de E2 | **Todas, sin excepcion** | CHG-09; cada LN registra su operacion con usuario, entidad y detalle |
 
 ### 12.4 Supuestos declarados
 
@@ -1521,7 +1529,18 @@ Nunca se sacrifican: seguridad, pedidos con RD1 y RD2, y el terminal tactil de a
 | E1 | Diagramas 4+1 | **Completo** | 12 diagramas Mermaid exportados a PNG + 8 del Modelo de Negocio |
 | E1 | Pruebas | **Completo** | 34 pruebas en verde (`mvn clean verify`) |
 | E1 | Integracion continua | **Completo** | `.github/workflows/ci.yml` con `mvn clean verify` |
-| E2 | Pedidos, Clientes y Planta | Pendiente | Sprint 2 |
+| E2 | ClienteDAO / ClienteLN / ClienteController | **Completo** | EF-1001-4: alta, edicion, busqueda y RUC unico (mensajes exactos de la especificacion) |
+| E2 | PedidoDAO / PedidoLN / PedidoController | **Completo** | EF-1001-3: bandeja con semaforo, alta con ficha tecnica, consulta, anulacion y exportacion CSV/Excel |
+| E2 | CotizacionLN y CotizacionDAO | **Completo** | Cotizacion con vigencia de 15 dias, tipo de cambio USD/PEN y adelanto verificado |
+| E2 | Patron State del pedido | **Completo** | `EstadoPedido` + 5 estados + `FabricaEstadoPedido`; transiciones validas centralizadas |
+| E2 | Viabilidad del pedido | **Completo** | Capacidad de telares (velocidad teorica x horas x turnos) contra el metraje del periodo |
+| E2 | AsignacionLN (RD3) | **Completo** | EF-1001-6: R-Turno (16 h), maquina en mantenimiento u ocupada, orden en produccion |
+| E2 | AvanceLN (R-Varianza) | **Completo** | EF-1001-7: varianza frente a la velocidad teorica, alerta de baja productividad, lote generado |
+| E2 | CalidadLN (RD7, R-Merma) | **Completo** | Inspeccion contra la tolerancia de la ficha tecnica, merma sin avance, cierre de lote y parte diario |
+| E2 | Auditoria | **Completo** | Todas las operaciones de PEDIDOS y PLANTA dejan traza en `registro_auditoria` |
+| E2 | Vistas | **Completo** | 13 plantillas (3 nuevas: consulta de pedido, cotizaciones y control de calidad) |
+| E2 | Pruebas | **Completo** | **79 pruebas** en verde: 5 de reglas de pedido, 5 de cotizacion, 4 de asignacion, 4 de avance, 4 de calidad, 5 del patron State, 31 de plantillas |
+| E2 | Verificacion en vivo | **Completo** | Ciclo completo probado contra la aplicacion en marcha: registrar -> cotizar -> adelanto -> produccion -> asignar -> avance -> calidad |
 | E3 | Abastecimiento, Reportes y cierre tecnico | Pendiente | Sprint 3 |
 
 ### 14.7 Herramientas de apoyo

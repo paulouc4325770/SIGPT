@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head(${titulo})}"></head>
+<body>
+<div th:replace="~{layout :: layout(~{::contenido})}">
+  <div th:fragment="contenido">
+    <h2 class="titulo-pantalla" th:text="${titulo}">Control de Calidad</h2>
+
+    <div class="alert alert-success" th:if="${mensajeExito}" th:text="${mensajeExito}"></div>
+    <div class="alert alert-danger" th:if="${mensajeError}" th:text="${mensajeError}"></div>
+    <div class="alert alert-info" th:if="${mensajeSinDatos}" th:text="${mensajeSinDatos}"></div>
+
+    <div class="row g-3">
+      <div class="col-12 col-lg-7">
+        <div class="card h-100">
+          <div class="card-header">Lotes pendientes de inspeccion</div>
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+              <tr><th>Lote</th><th>Orden</th><th>Metros</th><th>Estado</th></tr>
+              </thead>
+              <tbody>
+              <tr th:each="lote : ${lotes}">
+                <td th:text="${lote.codigo}">LOTE-2026-0001</td>
+                <td th:text="${lote.idOrdenProduccion}">1</td>
+                <td th:text="${lote.metros}">0</td>
+                <td>
+                  <span class="badge" th:classappend="${@clases.badge(lote.estado)}"
+                        th:text="${lote.estado}">PENDIENTE_INSPECCION</span>
+                </td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(lotes)}">
+                <td colspan="4" class="text-center text-muted py-4">
+                  No hay lotes pendientes de inspeccion de calidad.
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-5">
+        <div class="card h-100">
+          <div class="card-header">Registrar inspeccion (Regla RD7)</div>
+          <div class="card-body">
+            <form th:action="@{/planta/calidad/inspeccionar}" method="post"
+                  th:object="${inspeccion}">
+              <div class="mb-3">
+                <label class="form-label" for="idLote">Lote</label>
+                <select class="form-select" id="idLote" th:field="*{idLote}" required>
+                  <option value="">Seleccione un lote pendiente</option>
+                  <option th:each="lote : ${lotes}" th:value="${lote.idLote}"
+                          th:text="${lote.codigo}">LOTE-2026-0001</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="varianzaColorPct">Varianza de color (%)</label>
+                <input type="number" step="0.01" class="form-control" id="varianzaColorPct"
+                       th:field="*{varianzaColorPct}" required>
+                <div class="form-text">
+                  El sistema compara con la tolerancia de la ficha tecnica del pedido (RD7).
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="fechaInspeccion">Fecha</label>
+                <input type="date" class="form-control" id="fechaInspeccion" th:field="*{fecha}">
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="observacionInspeccion">Observacion</label>
+                <textarea class="form-control" id="observacionInspeccion" rows="2"
+                          th:field="*{observacion}"></textarea>
+              </div>
+              <div class="d-flex gap-2 justify-content-end">
+                <button type="submit" class="btn btn-primary">Registrar inspeccion</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mt-3" th:if="${lotesOrden != null and !lotesOrden.isEmpty()}">
+      <div class="card-header">Lotes de la orden seleccionada</div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+          <tr><th>Lote</th><th>Metros</th><th>Estado</th></tr>
+          </thead>
+          <tbody>
+          <tr th:each="lote : ${lotesOrden}">
+            <td th:text="${lote.codigo}">LOTE-2026-0001</td>
+            <td th:text="${lote.metros}">0</td>
+            <td>
+              <span class="badge" th:classappend="${@clases.badge(lote.estado)}"
+                    th:text="${lote.estado}">PENDIENTE_INSPECCION</span>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card mt-3">
+      <div class="card-header">Parte Diario de Produccion y Cierre de Lote</div>
+      <div class="card-body">
+        <form class="row g-2 align-items-end" th:action="@{/planta/calidad/parte-diario}"
+              method="post">
+          <div class="col-12 col-md-5">
+            <label class="form-label" for="idOrden">Orden de Produccion</label>
+            <select class="form-select" id="idOrden" name="idOrden" required>
+              <option value="">Seleccione</option>
+              <option th:each="orden : ${ordenes}" th:value="${orden.idOrden}"
+                      th:text="${orden.codOrden}">OP-2026-0001</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-4">
+            <label class="form-label" for="fechaParte">Fecha</label>
+            <input type="date" class="form-control" id="fechaParte" name="fecha">
+          </div>
+          <div class="col-12 col-md-3">
+            <button type="submit" class="btn btn-success w-100">
+              Generar Parte Diario (requiere 100 %)
+            </button>
+          </div>
+        </form>
+
+        <div class="table-responsive mt-3" th:if="${partes != null and !partes.isEmpty()}">
+          <table class="table table-hover align-middle mb-0">
+            <thead>
+            <tr><th>Fecha</th><th>Horas hombre</th><th>Horas maquina</th><th>Metros</th>
+              <th>Observaciones</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="p : ${partes}">
+              <td th:text="${p.fecha}">2026-11-12</td>
+              <td th:text="${p.horasHombre}">0</td>
+              <td th:text="${p.horasMaquina}">0</td>
+              <td th:text="${p.metros}">0</td>
+              <td th:text="${p.observaciones}"></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

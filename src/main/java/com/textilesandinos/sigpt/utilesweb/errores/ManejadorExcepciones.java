@@ -4,9 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
@@ -51,6 +53,25 @@ public class ManejadorExcepciones {
         LOG.warn("Dato invalido: {}", excepcion.getMessage());
         modelo.addAttribute("codigoError", 400);
         modelo.addAttribute("mensajeError", excepcion.getMessage());
+        return "error/error";
+    }
+
+    /**
+     * Error de validacion de los datos de un formulario: el valor recibido no
+     * se pudo convertir al tipo esperado.
+     *
+     * <p>Es un error del usuario, no del sistema: se responde 400 con un
+     * mensaje claro en vez de un 500.
+     */
+    @ExceptionHandler({MethodArgumentNotValidException.class,
+            MethodArgumentTypeMismatchException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String manejarDatoDeFormulario(Exception excepcion, Model modelo) {
+        LOG.warn("Dato de formulario invalido: {}", excepcion.getMessage());
+        modelo.addAttribute("codigoError", 400);
+        modelo.addAttribute("mensajeError",
+                "Alguno de los datos enviados no tiene un formato valido. "
+                        + "Revise el formulario e intentelo nuevamente.");
         return "error/error";
     }
 }

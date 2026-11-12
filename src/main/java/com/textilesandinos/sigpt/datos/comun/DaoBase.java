@@ -60,6 +60,35 @@ public abstract class DaoBase {
     }
 
     /**
+     * Genera el siguiente codigo correlativo de una entidad.
+     *
+     * <p>El formato es el que usa la base de datos: {@code prefijo + numero con
+     * la cantidad de digitos indicada}. El numero se calcula sobre el mayor
+     * correlativo existente y se verifica que el codigo resultante este libre,
+     * de modo que una serie con formatos mixtos no genere colisiones.
+     *
+     * @param sqlUltimo consulta que devuelve el ultimo correlativo en la columna
+     *                  {@code ultimo}
+     * @param prefijo  prefijo del codigo, por ejemplo {@code PED-2026-}
+     * @param digitos  cantidad de digitos del correlativo
+     * @param yaExiste comprueba si un codigo concreto ya esta en uso
+     */
+    protected String siguienteCodigo(String sqlUltimo, String prefijo, int digitos,
+            java.util.function.Predicate<String> yaExiste) {
+        int ultimo = consultarUno(sqlUltimo,
+                List.of(ParametroSql.texto("prefijo", prefijo + "%")),
+                resultado -> resultado.getInt("ultimo")).orElse(0);
+        for (int numero = ultimo + 1; numero <= ultimo + 1000; numero++) {
+            String codigo = prefijo + String.format("%0" + digitos + "d", numero);
+            if (!yaExiste.test(codigo)) {
+                return codigo;
+            }
+        }
+        throw new ExcepcionDatos("No se pudo generar un codigo correlativo con el prefijo "
+                + prefijo);
+    }
+
+    /**
      * Ejecuta una operacion dentro de una transaccion: se confirma completa o se
      * revierte completa.
      */

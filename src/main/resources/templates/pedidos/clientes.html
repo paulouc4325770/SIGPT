@@ -4,17 +4,18 @@
 <body>
 <div th:replace="~{layout :: layout(~{::contenido})}">
   <div th:fragment="contenido">
-    <h2 class="titulo-pantalla">Bandeja de Clientes</h2>
+    <h2 class="titulo-pantalla" th:text="${titulo}">Bandeja de Clientes</h2>
 
     <div class="alert alert-success" th:if="${mensajeExito}" th:text="${mensajeExito}">
       Cliente registrado satisfactoriamente
     </div>
     <div class="alert alert-danger" th:if="${mensajeError}" th:text="${mensajeError}"></div>
+    <div class="alert alert-info" th:if="${mensajeSinDatos}" th:text="${mensajeSinDatos}"></div>
 
     <div class="d-flex gap-2 mb-3">
       <form class="flex-fill d-flex gap-2" method="get" th:action="@{/pedidos/clientes}">
-        <input type="text" class="form-control" name="busqueda" placeholder="Razon social o RUC / Tax ID"
-               th:value="${busqueda}">
+        <input type="text" class="form-control" name="busqueda"
+               placeholder="Razon social o RUC / Tax ID" th:value="${busqueda}">
         <button type="submit" class="btn btn-outline-primary">Buscar</button>
       </form>
       <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
@@ -22,7 +23,7 @@
       </button>
     </div>
 
-    <!-- Formulario de alta / edicion (misma pantalla, como en el prototipo) -->
+    <!-- Formulario de alta / edicion -->
     <div class="collapse mb-3" id="formularioCliente">
       <div class="card">
         <div class="card-header" th:text="${clienteSeleccionado != null} ? 'Editar cliente' : 'Registrar cliente'">
@@ -30,10 +31,12 @@
         </div>
         <div class="card-body">
           <form th:action="@{/pedidos/clientes/guardar}" method="post" th:object="${cliente}">
+            <input type="hidden" th:field="*{idCliente}">
             <div class="row g-3">
               <div class="col-12 col-md-4">
                 <label class="form-label" for="razonSocial">Razon social</label>
-                <input type="text" class="form-control" id="razonSocial" th:field="*{razonSocial}" required>
+                <input type="text" class="form-control" id="razonSocial" th:field="*{razonSocial}"
+                       required>
               </div>
               <div class="col-12 col-md-4">
                 <label class="form-label" for="rucTaxId">RUC / Tax ID</label>
@@ -85,7 +88,8 @@
             <th>RUC / Tax ID</th>
             <th>Pais</th>
             <th>Contacto</th>
-            <th>Correo / Telefono</th>
+            <th>Correo</th>
+            <th>Telefono</th>
             <th>Estado</th>
             <th></th>
           </tr>
@@ -97,9 +101,10 @@
             <td th:text="${c.rucTaxId}">20100011122</td>
             <td th:text="${c.pais}">Peru</td>
             <td th:text="${c.contacto}">Contacto</td>
-            <td th:text="${c.correo} + ' / ' + ${c.telefono}">correo</td>
+            <td th:text="${c.correo}">correo</td>
+            <td th:text="${c.telefono}">telefono</td>
             <td>
-              <span class="badge" th:classappend="${c.estado == 'ACTIVO' ? 'bg-success' : 'bg-secondary'}"
+              <span class="badge" th:classappend="${@clases.badge(c.estado)}"
                     th:text="${c.estado}">ACTIVO</span>
             </td>
             <td class="text-end">
@@ -108,7 +113,7 @@
             </td>
           </tr>
           <tr th:if="${#lists.isEmpty(clientes)}">
-            <td colspan="8" class="text-center text-muted py-4">
+            <td colspan="9" class="text-center text-muted py-4">
               No se encontraron datos para los criterios seleccionados.
             </td>
           </tr>

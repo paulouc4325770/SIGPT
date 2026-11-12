@@ -1,5 +1,8 @@
 package com.textilesandinos.sigpt.presentacion;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,13 +13,31 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import com.textilesandinos.sigpt.entidades.abastecimiento.Insumo;
+import com.textilesandinos.sigpt.entidades.pedidos.Adelanto;
 import com.textilesandinos.sigpt.entidades.pedidos.Cliente;
+import com.textilesandinos.sigpt.entidades.pedidos.Cotizacion;
+import com.textilesandinos.sigpt.entidades.pedidos.FichaTecnica;
 import com.textilesandinos.sigpt.entidades.pedidos.Pedido;
+import com.textilesandinos.sigpt.entidades.pedidos.PedidoDetalle;
+import com.textilesandinos.sigpt.entidades.pedidos.PedidoFila;
+import com.textilesandinos.sigpt.entidades.pedidos.ResumenPedidos;
 import com.textilesandinos.sigpt.entidades.planta.Asignacion;
+import com.textilesandinos.sigpt.entidades.planta.Lote;
+import com.textilesandinos.sigpt.entidades.planta.Maquina;
+import com.textilesandinos.sigpt.entidades.planta.Operario;
+import com.textilesandinos.sigpt.entidades.planta.OrdenFila;
+import com.textilesandinos.sigpt.entidades.planta.ParteDiarioProduccion;
 import com.textilesandinos.sigpt.entidades.planta.RegistroAvance;
+import com.textilesandinos.sigpt.entidades.planta.Turno;
 import com.textilesandinos.sigpt.entidades.seguridad.Opcion;
 import com.textilesandinos.sigpt.entidades.seguridad.Perfil;
 import com.textilesandinos.sigpt.entidades.seguridad.Usuario;
+import com.textilesandinos.sigpt.negocio.pedidos.AdelantoFormulario;
+import com.textilesandinos.sigpt.negocio.pedidos.CotizacionFormulario;
+import com.textilesandinos.sigpt.negocio.pedidos.PedidoFormulario;
+import com.textilesandinos.sigpt.negocio.planta.AsignacionFormulario;
+import com.textilesandinos.sigpt.negocio.planta.AvanceFormulario;
+import com.textilesandinos.sigpt.negocio.planta.InspeccionFormulario;
 
 /**
  * Controlador auxiliar SOLO para pruebas: renderiza cada plantilla con un modelo
@@ -30,11 +51,23 @@ public class PlantillaDePruebasController {
 
     @GetMapping("/prueba-plantilla/{*nombre}")
     public String renderizar(@PathVariable String nombre, Model modelo) {
-        atributos().forEach(modelo::addAttribute);
-        return nombre;
+        String plantilla = nombre.startsWith("/") ? nombre.substring(1) : nombre;
+        Map<String, Object> atributos = atributos();
+        Pedido entidad = (Pedido) atributos.get("pedidoEntidad");
+        atributos.remove("pedidoEntidad");
+        // El formulario de pedido trabaja con un PedidoFormulario; la ficha del
+        // pedido, con la entidad Pedido.
+        atributos.put("pedido", "pedidos/formulario".equals(plantilla)
+                ? new PedidoFormulario()
+                : entidad);
+        atributos.forEach(modelo::addAttribute);
+        return plantilla;
     }
 
     private Map<String, Object> atributos() {
+        Map<String, Object> atributos = new LinkedHashMap<>();
+
+        // --- seguridad ---
         Perfil perfil = new Perfil();
         perfil.setIdPerfil(1);
         perfil.setCodPerfil("JPROD");
@@ -53,23 +86,209 @@ public class PlantillaDePruebasController {
         opcion.setUrlOpcion("/pedidos/bandeja");
         opcion.setNroOrden(1);
 
-        Map<String, Object> atributos = new LinkedHashMap<>();
         atributos.put("usuarioActual", usuario);
         atributos.put("menu", Map.of("Pedidos", List.of(opcion)));
         atributos.put("nombreAplicacion", "SIGPT");
         atributos.put("titulo", "Prueba de plantilla");
         atributos.put("tituloReporte", "Avance de Pedidos");
+        atributos.put("mensajeError", null);
+        atributos.put("mensajeExito", null);
+        atributos.put("mensajeAlerta", null);
+        atributos.put("mensajeSinDatos", null);
+
+        // --- pedidos ---
+        Cliente cliente = new Cliente();
+        cliente.setIdCliente(1);
+        cliente.setCodigo("CLI-001");
+        cliente.setRazonSocial("Marca Corporativa Andina S.A.C.");
+        cliente.setRucTaxId("20100011122");
+        cliente.setPais("Peru");
+        cliente.setEstado("ACTIVO");
+
+        Pedido pedido = new Pedido();
+        pedido.setIdPedido(1);
+        pedido.setCodPedido("PED-2026-001");
+        pedido.setIdCliente(1);
+        pedido.setMetros(new BigDecimal("3500.00"));
+        pedido.setMetrosConsolidados(new BigDecimal("1200.00"));
+        pedido.setFechaEntrega(LocalDate.of(2026, 12, 7));
+        pedido.setEstado("EN_PRODUCCION");
+
+        FichaTecnica ficha = new FichaTecnica();
+        ficha.setIdFicha(1);
+        ficha.setIdPedido(1);
+        ficha.setTipoHilado("Peinado 30/1");
+        ficha.setGramajeM2(new BigDecimal("180.00"));
+        ficha.setColorPantone("19-4023 TCX");
+        ficha.setComposicion("100% Algodon Pima");
+        ficha.setMetros(new BigDecimal("3500.00"));
+        ficha.setToleranciaColor(new BigDecimal("2.00"));
+
+        Cotizacion cotizacion = new Cotizacion();
+        cotizacion.setIdCotizacion(1);
+        cotizacion.setIdPedido(1);
+        cotizacion.setMontoTotal(new BigDecimal("12500.00"));
+        cotizacion.setMoneda("USD");
+        cotizacion.setCostoInsumos(new BigDecimal("7000.00"));
+        cotizacion.setHorasCiclo(new BigDecimal("96.00"));
+        cotizacion.setFechaEmision(LocalDate.of(2026, 11, 12));
+        cotizacion.setFechaVigencia(LocalDate.of(2026, 11, 27));
+        cotizacion.setEstado("EMITIDA");
+
+        Adelanto adelanto = new Adelanto();
+        adelanto.setIdAdelanto(1);
+        adelanto.setIdCotizacion(1);
+        adelanto.setMonto(new BigDecimal("6000.00"));
+        adelanto.setMoneda("USD");
+        adelanto.setFechaAdelanto(LocalDate.of(2026, 11, 13));
+        adelanto.setVerificado(true);
+        adelanto.setReferencia("LC-00145");
+
+        PedidoDetalle detalle = new PedidoDetalle();
+        detalle.setPedido(pedido);
+        detalle.setCliente(cliente);
+        detalle.setFichaTecnica(ficha);
+        detalle.setCotizaciones(List.of(cotizacion));
+        detalle.setAdelantos(List.of(adelanto));
+        detalle.setMontoPactado(new BigDecimal("12500.00"));
+        detalle.setAdelantoVerificado(new BigDecimal("6000.00"));
+        detalle.setPorcentajeAdelanto(new BigDecimal("48.00"));
+
+        PedidoFila fila = new PedidoFila();
+        fila.setIdPedido(1);
+        fila.setCodPedido("PED-2026-001");
+        fila.setIdCliente(1);
+        fila.setNombreCliente("Marca Corporativa Andina S.A.C.");
+        fila.setTipoHilado("Peinado 30/1");
+        fila.setGramajeM2(new BigDecimal("180.00"));
+        fila.setColorPantone("19-4023 TCX");
+        fila.setMetros(new BigDecimal("3500.00"));
+        fila.setMetrosConsolidados(new BigDecimal("1200.00"));
+        fila.setFechaEntrega(LocalDate.of(2026, 12, 7));
+        fila.setEstado("EN_PRODUCCION");
+
+        ResumenPedidos resumen = new ResumenPedidos();
+        resumen.setTotal(3);
+        resumen.setRegistrados(1);
+        resumen.setCotizados(1);
+        resumen.setEnProduccion(1);
+        resumen.setTerminados(0);
+        resumen.setAnulados(0);
+
+        atributos.put("pedidos", List.of(fila));
+        atributos.put("resumen", resumen);
+        atributos.put("clientes", List.of(cliente));
+        atributos.put("cliente", cliente);
         atributos.put("filtroCodigo", "");
+        atributos.put("filtroEstado", "");
         atributos.put("busqueda", "");
-        atributos.put("pedidos", List.of());
-        atributos.put("clientes", List.of());
-        atributos.put("proveedores", List.of());
-        atributos.put("insumos", List.of());
-        atributos.put("operarios", List.of());
-        atributos.put("maquinas", List.of());
-        atributos.put("turnos", List.of());
-        atributos.put("ordenes", List.of());
-        atributos.put("reportes", List.of());
+        atributos.put("pedidoEntidad", pedido);
+        atributos.put("detalle", detalle);        atributos.put("ficha", ficha);
+        atributos.put("cotizaciones", List.of(cotizacion));
+        atributos.put("cotizacion", new CotizacionFormulario());
+        atributos.put("adelanto", new AdelantoFormulario());
+
+        // --- planta ---
+        OrdenFila orden = new OrdenFila();
+        orden.setIdOrden(1);
+        orden.setCodOrden("OP-2026-0001");
+        orden.setIdPedido(1);
+        orden.setCodPedido("PED-2026-001");
+        orden.setNombreCliente("Marca Corporativa Andina S.A.C.");
+        orden.setMetrosTotales(new BigDecimal("3500.00"));
+        orden.setMetrosConsolidados(new BigDecimal("1200.00"));
+        orden.setEstado("EN_PRODUCCION");
+
+        Operario operario = new Operario();
+        operario.setIdOperario(1);
+        operario.setCodigo("OP-001");
+        operario.setNombres("Ana Quispe Mamani");
+        operario.setEspecialidad("TELAR");
+        operario.setEstado("ACTIVO");
+
+        Maquina maquina = new Maquina();
+        maquina.setIdMaquina(1);
+        maquina.setCodigo("TC-001");
+        maquina.setNombre("Telar circular 1");
+        maquina.setTipo("TELAR_CIRCULAR");
+        maquina.setEstado("LIBRE");
+        maquina.setVelocidadTeoricaMtsHora(new BigDecimal("45.00"));
+        maquina.setHorasPorTurno(new BigDecimal("8.00"));
+
+        Turno turno = new Turno();
+        turno.setIdTurno(1);
+        turno.setCodigo("MANANA");
+        turno.setNombre("Manana");
+        turno.setHoraInicio(LocalTime.of(6, 0));
+        turno.setHoraFin(LocalTime.of(14, 0));
+        turno.setHoras(new BigDecimal("8.00"));
+
+        Asignacion asignacion = new Asignacion();
+        asignacion.setIdAsignacion(1);
+        asignacion.setIdOperario(1);
+        asignacion.setIdMaquina(1);
+        asignacion.setIdTurno(1);
+        asignacion.setFecha(LocalDate.of(2026, 11, 12));
+        asignacion.setIdOrdenProduccion(1);
+        asignacion.setMetaMetros(new BigDecimal("3000.00"));
+        asignacion.setHorasAsignadas(new BigDecimal("8.00"));
+        asignacion.setEstado("ASIGNADA");
+
+        RegistroAvance avance = new RegistroAvance();
+        avance.setIdAvance(1);
+        avance.setIdAsignacion(1);
+        avance.setIdOrdenProduccion(1);
+        avance.setFecha(LocalDate.of(2026, 11, 12));
+        avance.setMetrosProducidos(new BigDecimal("300.00"));
+        avance.setMetrosMerma(new BigDecimal("12.00"));
+        avance.setVarianzaPct(new BigDecimal("-16.67"));
+        avance.setEstadoCalidad("PENDIENTE");
+
+        Lote lote = new Lote();
+        lote.setIdLote(1);
+        lote.setCodigo("LOTE-2026-0001");
+        lote.setIdOrdenProduccion(1);
+        lote.setIdAsignacion(1);
+        lote.setMetros(new BigDecimal("300.00"));
+        lote.setEstado("PENDIENTE_INSPECCION");
+
+        ParteDiarioProduccion parte = new ParteDiarioProduccion();
+        parte.setIdParte(1);
+        parte.setIdOrdenProduccion(1);
+        parte.setFecha(LocalDate.of(2026, 11, 12));
+        parte.setHorasHombre(new BigDecimal("24.00"));
+        parte.setHorasMaquina(new BigDecimal("24.00"));
+        parte.setMetros(new BigDecimal("3500.00"));
+        parte.setObservaciones("Cierre de lote");
+
+        atributos.put("ordenes", List.of(orden));
+        atributos.put("ordenSeleccionada", orden);
+        atributos.put("asignaciones", List.of(asignacion));
+        atributos.put("asignacion", asignacion);
+        atributos.put("operarios", List.of(operario));
+        atributos.put("maquinas", List.of(maquina));
+        atributos.put("turnos", List.of(turno));
+        atributos.put("asignacionForm", new AsignacionFormulario());
+        atributos.put("avance", new AvanceFormulario());
+        atributos.put("avances", List.of(avance));
+        atributos.put("lotes", List.of(lote));
+        atributos.put("lotesOrden", List.of(lote));
+        atributos.put("inspeccion", new InspeccionFormulario());
+        atributos.put("partes", List.of(parte));
+        atributos.put("fechaAsignacion", LocalDate.of(2026, 11, 12));
+        atributos.put("fechaInspeccion", LocalDate.of(2026, 11, 12));
+        atributos.put("codOperario", "OP-001");
+        atributos.put("codMaquina", "TC-001");
+        atributos.put("nombreTurno", "Manana");
+        atributos.put("metrosMeta", new BigDecimal("3000.00"));
+        atributos.put("metrosConsolidados", new BigDecimal("1200.00"));
+        atributos.put("porcentajeAvance", 34);
+        atributos.put("varianzaPct", new BigDecimal("-16.67"));
+
+        // --- abastecimiento y reportes ---
+        Insumo insumo = new Insumo();
+        atributos.put("insumos", List.of(insumo));
+        atributos.put("insumo", insumo);
         atributos.put("alertasStock", List.of());
         atributos.put("indicadores", List.of());
         atributos.put("filas", List.of());
@@ -78,18 +297,6 @@ public class PlantillaDePruebasController {
         atributos.put("mostrarCliente", true);
         atributos.put("mostrarOperario", false);
         atributos.put("mostrarMaquina", false);
-        atributos.put("fechaAsignacion", "19/07/2026");
-        atributos.put("metrosMeta", 3000);
-        atributos.put("metrosConsolidados", 1200);
-        atributos.put("metrosMermaReprocesada", 60);
-        atributos.put("porcentajeAvance", 40);
-        atributos.put("varianzaPct", -18.5);
-
-        atributos.put("pedido", new Pedido());
-        atributos.put("cliente", new Cliente());
-        atributos.put("insumo", new Insumo());
-        atributos.put("asignacionForm", new Asignacion());
-        atributos.put("avance", new RegistroAvance());
 
         return atributos;
     }

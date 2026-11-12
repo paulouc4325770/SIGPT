@@ -213,19 +213,38 @@ done
 | Entregable | Contenido | Estado |
 |---|---|---|
 | E1 | Base de datos, esqueleto de código, módulo de seguridad, vistas, diagramas | **Completo** |
-| E2 | Pedidos, clientes y planta | Pendiente |
-| E3 | Abastecimiento, reportes y cierre técnico | Pendiente |
+| E2 | Pedidos (EF-1001-3), clientes (EF-1001-4) y planta (EF-1001-6, EF-1001-7) | **Completo** |
+| E3 | Abastecimiento (EF-1001-5), reportes (EF-1001-8) y cierre técnico | Pendiente |
+
+### Pantallas de E2
+
+| Pantalla | Ruta | Perfil |
+|---|---|---|
+| Bandeja de pedidos (con semáforo y exportación CSV/Excel) | `/pedidos/bandeja` | Jefe de Producción |
+| Nuevo pedido con su ficha técnica | `/pedidos/nuevo` | Jefe de Producción |
+| Ficha del pedido (cotizaciones, adelanto, orden de producción) | `/pedidos/bandeja/consultar/{id}` | Jefe de Producción |
+| Cotizaciones y adelantos | `/pedidos/cotizaciones` | Jefe de Producción |
+| Bandeja de clientes | `/pedidos/clientes` | Jefe de Producción |
+| Asignación de operarios y maquinaria | `/planta/asignacion` | Supervisor |
+| Terminal táctil de registro de avance | `/planta/avance` | Operario / Supervisor |
+| Control de calidad, cierre de lote y parte diario | `/planta/calidad` | Supervisor |
 
 ### Pruebas actuales
 
 | Suite | Casos | Qué cubre |
 |---|---|---|
+| `PedidoLNTest` | 6 | **RD1** (metraje mínimo de 1,000 m), cliente inactivo, viabilidad, anulación por ciclo de vida, auditoría |
+| `CotizacionLNTest` | 5 | Vigencia de 15 días, **RD2** (adelanto del 40 % habilita la producción), cotización vencida, pedido anulado |
+| `AsignacionLNTest` | 4 | **RD3** (16 h consecutivas), máquina en mantenimiento, máquina ocupada en el turno |
+| `AvanceLNTest` | 4 | **R-Varianza** (alerta de baja productividad), lote generado, incidencia |
+| `CalidadLNTest` | 4 | **RD7** (tolerancia de la ficha técnica), **R-Merma** (la merma no avanza el pedido), cierre de lote |
+| `FabricaEstadoPedidoTest` | 5 | **State**: transiciones válidas del ciclo de vida del pedido |
 | `SeguridadLNTest` | 7 | Autenticación, intentos fallidos, bloqueo, usuario inactivo, no revelar cuentas |
-| `PruebasPlantillasTest` | 14 | Render de las 10 plantillas + el filtro de permisos en cada petición |
+| `PruebasPlantillasTest` | 31 | Render de las 13 plantillas, sin contenido duplicado, filtro de permisos en cada petición |
 | `HashHelperTest` | 6 | Hash PBKDF2, salt por usuario, rechazo de clave vacía |
-| `MenuHelperTest` | 5 | Agrupación del menú, control de acceso por ruta |
+| `MenuHelperTest` | 5 | Agrupación del menú, control de acceso por ruta y subruta |
 | `SigptApplicationTests` | 2 | Arranque del contexto de Spring |
-| **Total** | **34** | `mvn clean verify` |
+| **Total** | **79** | `mvn clean verify` |
 
 ---
 

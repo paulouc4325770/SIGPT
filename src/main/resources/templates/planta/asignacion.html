@@ -4,27 +4,29 @@
 <body>
 <div th:replace="~{layout :: layout(~{::contenido})}">
   <div th:fragment="contenido">
-    <h2 class="titulo-pantalla">Asignar Operarios y Maquinaria</h2>
+    <h2 class="titulo-pantalla" th:text="${titulo}">Asignar Operarios y Maquinaria</h2>
 
+    <div class="alert alert-success" th:if="${mensajeExito}" th:text="${mensajeExito}"></div>
     <div class="alert alert-danger" th:if="${mensajeError}" th:text="${mensajeError}">
       El operario excede el limite permitido de horas de trabajo: el sistema bloquea la asignacion
       y muestra el motivo (Regla R-Turno / RD3).
     </div>
+    <div class="alert alert-info" th:if="${mensajeSinDatos}" th:text="${mensajeSinDatos}"></div>
 
     <div class="row g-3">
-      <!-- Ordenes de produccion en curso -->
       <div class="col-12 col-lg-4">
         <div class="card h-100">
           <div class="card-header">Ordenes de Produccion "En Produccion"</div>
           <div class="list-group list-group-flush">
-            <a th:each="op : ${ordenes}" th:href="@{'/planta/asignacion?orden=' + ${op.idOrden}}"
+            <a th:each="orden : ${ordenes}"
+               th:href="@{'/planta/asignacion?orden=' + ${orden.idOrden}}"
                class="list-group-item list-group-item-action">
               <div class="d-flex justify-content-between">
-                <strong th:text="${op.codOrden}">OP-0451</strong>
-                <span class="text-muted" th:text="${op.metrosTotales} + ' m'">0 m</span>
+                <strong th:text="${orden.codOrden}">OP-2026-0001</strong>
+                <span class="text-muted" th:text="${orden.metrosTotales}">0</span>
               </div>
-              <small class="text-muted"
-                     th:text="'Consolidado: ' + ${op.metrosConsolidados} + ' m'">0 m</small>
+              <small class="text-muted" th:text="${orden.codPedido}">PED-2026-001</small>
+              <small class="text-muted d-block" th:text="${orden.nombreCliente}">Cliente</small>
             </a>
             <div class="list-group-item text-muted" th:if="${#lists.isEmpty(ordenes)}">
               No hay ordenes en produccion.
@@ -33,53 +35,64 @@
         </div>
       </div>
 
-      <!-- Tablero de asignacion -->
       <div class="col-12 col-lg-8">
         <div class="card">
           <div class="card-header d-flex justify-content-between align-items-center">
-            <span th:text="'Asignacion de la OP ' + (${ordenSeleccionada != null} ? ${ordenSeleccionada.codOrden} : '')">
+            <span th:text="'Asignacion de la OP '
+              + (${ordenSeleccionada != null} ? ${ordenSeleccionada.codOrden} : '(sin seleccionar)')">
               Asignacion
             </span>
-            <span class="text-muted small" th:text="${fechaAsignacion}">19/07/2026</span>
+            <span class="text-muted small" th:text="${fechaAsignacion}">2026-11-12</span>
           </div>
           <div class="card-body">
-            <!-- Leyenda de estados -->
             <div class="d-flex flex-wrap gap-3 mb-3 small">
-              <span><span class="badge bg-success">Asignado</span> turno asignado</span>
-              <span><span class="badge bg-secondary">Disponible</span> disponible</span>
-              <span><span class="badge bg-danger">Bloqueado</span> bloqueado por Regla R-Turno (16 h consecutivas)</span>
+              <span><span class="badge bg-success">Asignada</span> turno asignado</span>
+              <span><span class="badge bg-secondary">Libre</span> disponible</span>
+              <span><span class="badge bg-danger">Mantenimiento</span> no asignable</span>
+              <span><span class="badge bg-warning">Back-up</span> reserva</span>
             </div>
 
-            <form th:action="@{/planta/asignacion/guardar}" method="post" th:object="${asignacionForm}">
+            <form th:action="@{/planta/asignacion/guardar}" method="post"
+                  th:object="${asignacionForm}">
               <div class="row g-3 mb-3">
                 <div class="col-12 col-md-4">
+                  <label class="form-label" for="idOrdenProduccion">Orden de Produccion</label>
+                  <select class="form-select" id="idOrdenProduccion" th:field="*{idOrdenProduccion}"
+                          required>
+                    <option value="">Seleccione</option>
+                    <option th:each="orden : ${ordenes}" th:value="${orden.idOrden}"
+                            th:text="${orden.codOrden}">OP-2026-0001</option>
+                  </select>
+                </div>
+                <div class="col-12 col-md-4">
                   <label class="form-label" for="idOperario">Operario</label>
-                  <select class="form-select" id="idOperario" th:field="*{idOperario}">
+                  <select class="form-select" id="idOperario" th:field="*{idOperario}" required>
                     <option value="">Seleccione</option>
                     <option th:each="o : ${operarios}" th:value="${o.idOperario}"
-                            th:text="${o.codigo + ' - ' + o.nombres}">OP-001</option>
+                            th:text="${o.codigo}">OP-001</option>
                   </select>
                 </div>
                 <div class="col-12 col-md-4">
                   <label class="form-label" for="idMaquina">Maquina</label>
-                  <select class="form-select" id="idMaquina" th:field="*{idMaquina}">
+                  <select class="form-select" id="idMaquina" th:field="*{idMaquina}" required>
                     <option value="">Seleccione</option>
                     <option th:each="m : ${maquinas}" th:value="${m.idMaquina}"
-                            th:text="${m.codigo + ' - ' + m.nombre}" th:disabled="${m.estado != 'LIBRE'}">
+                            th:text="${m.codigo}" th:disabled="${m.estado == 'MANTENIMIENTO'}">
                       TC-009
                     </option>
                   </select>
                 </div>
                 <div class="col-12 col-md-4">
                   <label class="form-label" for="idTurno">Turno</label>
-                  <select class="form-select" id="idTurno" th:field="*{idTurno}">
+                  <select class="form-select" id="idTurno" th:field="*{idTurno}" required>
+                    <option value="">Seleccione</option>
                     <option th:each="t : ${turnos}" th:value="${t.idTurno}"
                             th:text="${t.nombre}">Manana</option>
                   </select>
                 </div>
                 <div class="col-12 col-md-4">
                   <label class="form-label" for="fecha">Fecha</label>
-                  <input type="date" class="form-control" id="fecha" th:field="*{fecha}" required>
+                  <input type="date" class="form-control" id="fecha" th:field="*{fecha}">
                 </div>
                 <div class="col-12 col-md-4">
                   <label class="form-label" for="metaMetros">Meta de metros</label>
@@ -95,36 +108,48 @@
           </div>
         </div>
 
-        <!-- Estado de las maquinas -->
+        <div class="card mt-3" th:if="${asignaciones != null and !asignaciones.isEmpty()}">
+          <div class="card-header">Asignaciones registradas</div>
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+              <tr><th>Operario</th><th>Maquina</th><th>Turno</th><th>Fecha</th>
+                <th>Horas</th><th>Meta (m)</th><th>Estado</th></tr>
+              </thead>
+              <tbody>
+              <tr th:each="a : ${asignaciones}">
+                <td th:text="${a.idOperario}">1</td>
+                <td th:text="${a.idMaquina}">1</td>
+                <td th:text="${a.idTurno}">1</td>
+                <td th:text="${a.fecha}">2026-11-12</td>
+                <td th:text="${a.horasAsignadas}">8</td>
+                <td th:text="${a.metaMetros}">0</td>
+                <td>
+                  <span class="badge" th:classappend="${@clases.badge(a.estado)}"
+                        th:text="${a.estado}">ASIGNADA</span>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         <div class="card mt-3">
           <div class="card-header">Estado de las maquinas</div>
           <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
               <thead>
-              <tr>
-                <th>Maquina</th>
-                <th>Tipo</th>
-                <th>Estado</th>
-                <th>Velocidad teorica</th>
-                <th></th>
-              </tr>
+              <tr><th>Maquina</th><th>Tipo</th><th>Estado</th><th>Velocidad teorica</th></tr>
               </thead>
               <tbody>
               <tr th:each="m : ${maquinas}">
-                <td th:text="${m.codigo} + ' - ' + ${m.nombre}">TC-001</td>
-                <td th:text="${m.tipo}">TELAR_CIRCULAR</td>
+                <td th:text="${m.codigo}">TC-001</td>
+                <td th:text="${m.nombre}">Telar circular 1</td>
                 <td>
-                  <span class="badge"
-                        th:classappend="${m.estado == 'LIBRE' ? 'bg-secondary'
-                          : (m.estado == 'OCUPADA' ? 'bg-primary'
-                          : (m.estado == 'MANTENIMIENTO' ? 'bg-danger' : 'bg-warning'))"
+                  <span class="badge" th:classappend="${@clases.badge(m.estado)}"
                         th:text="${m.estado}">LIBRE</span>
                 </td>
-                <td th:text="${m.velocidadTeoricaMtsHora} + ' m/h'">0 m/h</td>
-                <td class="text-end">
-                  <span class="badge bg-secondary" th:if="${m.estado == 'MANTENIMIENTO'}">mantenim.</span>
-                  <span class="badge bg-warning" th:if="${m.estado == 'BACKUP'}">back-up</span>
-                </td>
+                <td th:text="${m.velocidadTeoricaMtsHora}">0</td>
               </tr>
               </tbody>
             </table>

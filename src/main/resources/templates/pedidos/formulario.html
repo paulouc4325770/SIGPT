@@ -7,18 +7,17 @@
     <h2 class="titulo-pantalla">Nuevo Pedido Textil</h2>
 
     <div class="alert alert-danger" th:if="${mensajeError}" th:text="${mensajeError}">
-      Metraje inferior a 1,000 m: el sistema impide guardar el pedido y muestra la alerta
-      correspondiente (Regla R1).
+      El metraje minimo de manufactura y teñido es de 1,000 metros (Regla R1).
     </div>
     <div class="alert alert-success" th:if="${mensajeExito}" th:text="${mensajeExito}"></div>
 
     <!-- Aviso de la especificacion: el pedido no avanza sin el 40% de adelanto -->
     <div class="alert alert-warning">
-      Ninguna Orden de Produccion se emite a planta sin un adelanto minimo del 40% verificado
+      Ninguna Orden de Produccion se emite a planta sin un adelanto minimo del 40 % verificado
       (Regla R2).
     </div>
 
-    <form th:action="@{/pedidos/guardar}" method="post" th:object="${pedido}">
+    <form th:action="@{/pedidos/nuevo/guardar}" method="post" th:object="${pedido}">
       <div class="card mb-3">
         <div class="card-header">Ficha tecnica</div>
         <div class="card-body">
@@ -33,45 +32,47 @@
             </div>
             <div class="col-12 col-md-4">
               <label class="form-label" for="tipoHilado">Tipo de hilado</label>
-              <input type="text" class="form-control" id="tipoHilado" name="tipoHilado"
+              <input type="text" class="form-control" id="tipoHilado" th:field="*{tipoHilado}"
                      placeholder="Peinado 30/1" required>
             </div>
             <div class="col-12 col-md-4">
               <label class="form-label" for="gramajeM2">Gramaje (g/m²)</label>
               <input type="number" step="0.01" min="0" class="form-control" id="gramajeM2"
-                     name="gramajeM2" required>
+                     th:field="*{gramajeM2}" required>
             </div>
 
             <div class="col-12 col-md-4">
               <label class="form-label" for="colorPantone">Color (Pantone)</label>
-              <input type="text" class="form-control" id="colorPantone" name="colorPantone"
+              <input type="text" class="form-control" id="colorPantone" th:field="*{colorPantone}"
                      placeholder="19-4023 TCX" required>
             </div>
             <div class="col-12 col-md-4">
               <label class="form-label" for="composicion">Composicion de la mezcla</label>
-              <input type="text" class="form-control" id="composicion" name="composicion"
+              <input type="text" class="form-control" id="composicion" th:field="*{composicion}"
                      placeholder="100% Algodon Pima" required>
             </div>
             <div class="col-12 col-md-4">
               <label class="form-label" for="metros">Metros</label>
               <input type="number" step="0.01" min="0" class="form-control" id="metros"
                      th:field="*{metros}" required>
-              <div class="form-text">El metraje minimo de manufactura y tenido es de 1,000 m (RD1).</div>
+              <div class="form-text">El metraje minimo de manufactura y teñido es de 1,000 m (RD1).</div>
             </div>
 
             <div class="col-12 col-md-4">
               <label class="form-label" for="toleranciaColor">Tolerancia de varianza de color (%)</label>
               <input type="number" step="0.01" min="0" class="form-control" id="toleranciaColor"
-                     name="toleranciaColor">
+                     th:field="*{toleranciaColor}">
               <div class="form-text">Criterio de RD7: el Supervisor no aprueba lotes que la excedan.</div>
             </div>
             <div class="col-12 col-md-4">
               <label class="form-label" for="fechaEntrega">Fecha de entrega</label>
-              <input type="date" class="form-control" id="fechaEntrega" th:field="*{fechaEntrega}">
+              <input type="date" class="form-control" id="fechaEntrega" th:field="*{fechaEntrega}"
+                     required>
             </div>
             <div class="col-12 col-md-4">
               <label class="form-label" for="observaciones">Observaciones</label>
-              <input type="text" class="form-control" id="observaciones" name="observaciones">
+              <input type="text" class="form-control" id="observaciones"
+                     th:field="*{observaciones}">
             </div>
           </div>
         </div>

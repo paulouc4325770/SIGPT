@@ -132,8 +132,7 @@
                 <p class="kpi-titulo" th:text="${s.etiqueta}">Estado</p>
                 <p class="kpi-valor">
                   <span class="badge"
-                        th:classappend="${s.color == 'VERDE' ? 'bg-success'
-                          : (s.color == 'AMARILLO' ? 'bg-warning' : 'bg-danger')}"
+                        th:classappend="${s.color == 'VERDE' ? 'bg-success' : (s.color == 'AMARILLO' ? 'bg-warning' : 'bg-danger')}"
                         th:text="${s.cantidad}">0</span>
                 </p>
               </div>

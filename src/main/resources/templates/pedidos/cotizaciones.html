@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head(${titulo})}"></head>
+<body>
+<div th:replace="~{layout :: layout(~{::contenido})}">
+  <div th:fragment="contenido">
+    <h2 class="titulo-pantalla" th:text="${titulo}">Cotizaciones y Adelantos</h2>
+
+    <div class="alert alert-success" th:if="${mensajeExito}" th:text="${mensajeExito}"></div>
+    <div class="alert alert-danger" th:if="${mensajeError}" th:text="${mensajeError}"></div>
+    <div class="alert alert-info" th:if="${mensajeSinDatos}" th:text="${mensajeSinDatos}"></div>
+
+    <div class="row g-3">
+      <!-- Emision de cotizacion -->
+      <div class="col-12 col-lg-6">
+        <div class="card h-100">
+          <div class="card-header">Emitir cotizacion</div>
+          <div class="card-body">
+            <form th:action="@{/pedidos/cotizaciones/guardar}" method="post"
+                  th:object="${cotizacion}">
+              <div class="mb-3">
+                <label class="form-label" for="idPedido">Pedido</label>
+                <select class="form-select" id="idPedido" th:field="*{idPedido}" required>
+                  <option value="">Seleccione un pedido registrado</option>
+                  <option th:each="p : ${pedidos}" th:value="${p.idPedido}"
+                          th:text="${p.codPedido + ' | ' + p.nombreCliente + ' | ' + p.metros + ' m'}">
+                    PED-2026-001
+                  </option>
+                </select>
+              </div>
+              <div class="row g-2 mb-3">
+                <div class="col-6">
+                  <label class="form-label" for="montoTotal">Monto total pactado</label>
+                  <input type="number" step="0.01" min="0" class="form-control" id="montoTotal"
+                         th:field="*{montoTotal}" required>
+                </div>
+                <div class="col-6">
+                  <label class="form-label" for="moneda">Moneda</label>
+                  <select class="form-select" id="moneda" th:field="*{moneda}">
+                    <option value="USD">USD</option>
+                    <option value="PEN">PEN</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row g-2 mb-3">
+                <div class="col-6">
+                  <label class="form-label" for="costoInsumos">Costo de insumos</label>
+                  <input type="number" step="0.01" min="0" class="form-control" id="costoInsumos"
+                         th:field="*{costoInsumos}">
+                </div>
+                <div class="col-6">
+                  <label class="form-label" for="horasCiclo">Horas de ciclo estimadas</label>
+                  <input type="number" step="0.01" min="0" class="form-control" id="horasCiclo"
+                         th:field="*{horasCiclo}">
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="fechaEmision">Fecha de emision</label>
+                <input type="date" class="form-control" id="fechaEmision" th:field="*{fechaEmision}">
+                <div class="form-text">La vigencia se calcula con el parametro del sistema (15 dias).</div>
+              </div>
+              <div class="d-flex gap-2 justify-content-end">
+                <button type="submit" class="btn btn-primary">Emitir cotizacion</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Registro de adelanto -->
+      <div class="col-12 col-lg-6">
+        <div class="card h-100">
+          <div class="card-header">Registrar adelanto (Regla R2: minimo 40 %)</div>
+          <div class="card-body">
+            <form th:action="@{/pedidos/cotizaciones/adelanto}" method="post"
+                  th:object="${adelanto}">
+              <div class="mb-3">
+                <label class="form-label" for="idCotizacion">Cotizacion</label>
+                <select class="form-select" id="idCotizacion" th:field="*{idCotizacion}" required>
+                  <option value="">Seleccione una cotizacion vigente</option>
+                  <option th:each="c : ${cotizaciones}" th:value="${c.idCotizacion}"
+                          th:text="${c.idPedido + ' | ' + c.montoTotal + ' ' + c.moneda + ' | vence ' + c.fechaVigencia}">
+                    Cotizacion
+                  </option>
+                </select>
+              </div>
+              <div class="row g-2 mb-3">
+                <div class="col-6">
+                  <label class="form-label" for="montoAdelanto">Monto</label>
+                  <input type="number" step="0.01" min="0" class="form-control" id="montoAdelanto"
+                         th:field="*{monto}" required>
+                </div>
+                <div class="col-6">
+                  <label class="form-label" for="fechaAdelanto">Fecha</label>
+                  <input type="date" class="form-control" id="fechaAdelanto"
+                         th:field="*{fechaAdelanto}">
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="referencia">Referencia</label>
+                <input type="text" class="form-control" id="referencia" th:field="*{referencia}"
+                       placeholder="Letra de credito o transferencia">
+              </div>
+              <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="verificado"
+                       th:field="*{verificado}">
+                <label class="form-check-label" for="verificado">
+                  Adelanto verificado por el Jefe de Produccion
+                </label>
+              </div>
+              <div class="d-flex gap-2 justify-content-end">
+                <button type="submit" class="btn btn-primary">Registrar adelanto</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cotizaciones emitidas -->
+    <div class="card mt-3">
+      <div class="card-header">Cotizaciones emitidas</div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+          <tr><th>Pedido</th><th>Monto</th><th>Moneda</th><th>Costo insumos</th>
+            <th>Horas ciclo</th><th>Emision</th><th>Vigencia</th><th>Estado</th></tr>
+          </thead>
+          <tbody>
+          <tr th:each="c : ${cotizaciones}">
+            <td th:text="${c.idPedido}">1</td>
+            <td th:text="${c.montoTotal}">0</td>
+            <td th:text="${c.moneda}">USD</td>
+            <td th:text="${c.costoInsumos}">0</td>
+            <td th:text="${c.horasCiclo}">0</td>
+            <td th:text="${c.fechaEmision}">2026-11-12</td>
+            <td th:text="${c.fechaVigencia}">2026-11-27</td>
+            <td>
+              <span class="badge"
+                    th:classappend="${c.estado == 'EMITIDA' ? 'bg-info' : (c.estado == 'VENCIDA' ? 'bg-secondary' : 'bg-success')}"
+                    th:text="${c.estado}">EMITIDA</span>
+            </td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(cotizaciones)}">
+            <td colspan="8" class="text-center text-muted py-4">
+              No se encontraron datos para los criterios seleccionados.
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

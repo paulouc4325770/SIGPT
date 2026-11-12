@@ -120,11 +120,11 @@
                 <td th:text="${i.codigo}">INS-001</td>
                 <td th:text="${i.nombre}">Insumo</td>
                 <td th:text="${i.tipo}">FIBRA</td>
-                <td th:text="${i.stockActual} + ' ' + ${i.unidadMedida}">0 KG</td>
+                <td th:text="${i.stockActual + ' ' + i.unidadMedida}">0 KG</td>
                 <td th:text="${i.stockMinimo}">0</td>
                 <td>
                   <span class="badge" th:classappend="${i.rutaMsds != null ? 'bg-success' : 'bg-danger'}"
-                        th:text="${i.rutaMsds != null} ? 'Si' : 'No'">Si</span>
+                        th:text="${i.rutaMsds != null ? 'Si' : 'No'}">Si</span>
                 </td>
                 <td>
                   <span class="badge" th:classappend="${i.estado == 'ACTIVO' ? 'bg-success' : 'bg-secondary'}"

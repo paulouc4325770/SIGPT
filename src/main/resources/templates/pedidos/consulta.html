@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head(${titulo})}"></head>
+<body>
+<div th:replace="~{layout :: layout(~{::contenido})}">
+  <div th:fragment="contenido">
+    <h2 class="titulo-pantalla" th:text="${titulo}">Ficha del Pedido</h2>
+
+    <div class="alert alert-success" th:if="${mensajeExito}" th:text="${mensajeExito}"></div>
+    <div class="alert alert-danger" th:if="${mensajeError}" th:text="${mensajeError}"></div>
+
+    <div class="row g-3">
+      <div class="col-12 col-lg-6">
+        <div class="card h-100">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <span th:text="${pedido.codPedido}">PED-2026-001</span>
+            <span class="badge" th:classappend="${@clases.badge(pedido.estado)}"
+                  th:text="${pedido.estado}">REGISTRADO</span>
+          </div>
+          <div class="card-body">
+            <table class="table table-sm mb-0">
+              <tbody>
+              <tr>
+                <th class="w-50">Cliente</th>
+                <td th:text="${detalle.cliente != null} ? ${detalle.cliente.razonSocial} : ''">Cliente</td>
+              </tr>
+              <tr>
+                <th>Tipo de hilado</th>
+                <td th:text="${ficha != null} ? ${ficha.tipoHilado} : ''">Peinado 30/1</td>
+              </tr>
+              <tr>
+                <th>Gramaje</th>
+                <td th:text="${ficha != null} ? ${ficha.gramajeM2} : ''">180</td>
+              </tr>
+              <tr>
+                <th>Color Pantone</th>
+                <td th:text="${ficha != null} ? ${ficha.colorPantone} : ''">19-4023 TCX</td>
+              </tr>
+              <tr>
+                <th>Composicion</th>
+                <td th:text="${ficha != null} ? ${ficha.composicion} : ''">100% Algodon Pima</td>
+              </tr>
+              <tr>
+                <th>Metros pedidos</th>
+                <td th:text="${pedido.metros}">3500</td>
+              </tr>
+              <tr>
+                <th>Metros consolidados</th>
+                <td th:text="${pedido.metrosConsolidados}">0</td>
+              </tr>
+              <tr>
+                <th>Tolerancia de color</th>
+                <td th:text="${ficha != null} ? ${ficha.toleranciaColor} : ''">2</td>
+              </tr>
+              <tr>
+                <th>Fecha de entrega</th>
+                <td th:text="${pedido.fechaEntrega}">2026-12-07</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-6">
+        <div class="card mb-3">
+          <div class="card-header">Cotizaciones</div>
+          <div class="table-responsive">
+            <table class="table table-sm mb-0">
+              <thead>
+              <tr><th>Emision</th><th>Vigencia</th><th>Monto</th><th>Estado</th></tr>
+              </thead>
+              <tbody>
+              <tr th:each="c : ${detalle.cotizaciones}">
+                <td th:text="${c.fechaEmision}">2026-11-12</td>
+                <td th:text="${c.fechaVigencia}">2026-11-27</td>
+                <td th:text="${c.montoTotal}">0</td>
+                <td>
+                  <span class="badge" th:classappend="${@clases.badge(c.estado)}"
+                        th:text="${c.estado}">EMITIDA</span>
+                </td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(detalle.cotizaciones)}">
+                <td colspan="4" class="text-center text-muted py-3">
+                  El pedido aun no tiene cotizacion.
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-header">Adelanto verificado (Regla R2)</div>
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <span>Valor pactado</span>
+              <strong th:text="${detalle.montoPactado}">0</strong>
+            </div>
+            <div class="d-flex justify-content-between">
+              <span>Adelanto verificado</span>
+              <strong th:text="${detalle.adelantoVerificado}">0</strong>
+            </div>
+            <div class="d-flex justify-content-between">
+              <span>Porcentaje cubierto</span>
+              <strong th:text="${detalle.porcentajeAdelanto}">0</strong>
+            </div>
+            <div class="progress mt-2">
+              <div class="progress-bar" role="progressbar"
+                   th:style="'width:' + ${detalle.porcentajeAdelanto} + '%'"
+                   th:classappend="${detalle.porcentajeAdelanto >= 40} ? 'bg-success' : 'bg-warning'"
+                   th:text="${detalle.porcentajeAdelanto}">0</div>
+            </div>
+            <p class="form-text">La produccion se habilita al cubrir el 40 % del valor pactado.</p>
+          </div>
+        </div>
+
+        <div class="card" th:if="${detalle.ordenProduccion != null}">
+          <div class="card-header">Orden de Produccion</div>
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <span>Codigo</span>
+              <strong th:text="${detalle.ordenProduccion.codOrden}">OP-2026-0001</strong>
+            </div>
+            <div class="d-flex justify-content-between">
+              <span>Metros totales</span>
+              <strong th:text="${detalle.ordenProduccion.metrosTotales}">3500</strong>
+            </div>
+            <div class="d-flex justify-content-between">
+              <span>Estado</span>
+              <strong th:text="${detalle.ordenProduccion.estado}">EN_PRODUCCION</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex gap-2 justify-content-end mt-3">
+      <a class="btn btn-outline-secondary" th:href="@{/pedidos/bandeja}">Volver a la bandeja</a>
+      <form th:if="${pedido.estado == 'REGISTRADO' or pedido.estado == 'COTIZADO'}"
+            th:action="@{/pedidos/bandeja/anular}" method="post">
+        <input type="hidden" name="idPedido" th:value="${pedido.idPedido}">
+        <input type="text" name="motivo" class="form-control d-inline-block w-auto me-2"
+               placeholder="Motivo de anulacion">
+        <button type="submit" class="btn btn-outline-danger">Anular pedido</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

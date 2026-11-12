@@ -49,9 +49,12 @@ class PruebasPlantillasTest {
             "pedidos/bandeja",
             "pedidos/formulario",
             "pedidos/clientes",
+            "pedidos/consulta",
+            "pedidos/cotizaciones",
             "abastecimiento/insumos",
             "planta/asignacion",
             "planta/avance",
+            "planta/calidad",
             "reportes/formulario"
     })
     void renderizaPlantilla(String nombre) throws Exception {
@@ -76,9 +79,12 @@ class PruebasPlantillasTest {
             "pedidos/bandeja,        titulo-pantalla",
             "pedidos/formulario,     titulo-pantalla",
             "pedidos/clientes,       titulo-pantalla",
+            "pedidos/consulta,       titulo-pantalla",
+            "pedidos/cotizaciones,   titulo-pantalla",
             "abastecimiento/insumos, titulo-pantalla",
             "planta/asignacion,      titulo-pantalla",
             "planta/avance,          titulo-pantalla",
+            "planta/calidad,         titulo-pantalla",
             "reportes/formulario,    titulo-pantalla"
     })
     void renderizaPlantillaUnaSolaVez(String nombre, String marcador) throws Exception {
