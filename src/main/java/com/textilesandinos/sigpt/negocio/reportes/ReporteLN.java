@@ -14,6 +14,7 @@ import com.textilesandinos.sigpt.negocio.reportes.formato.FormatoExcel;
 import com.textilesandinos.sigpt.negocio.reportes.formato.FormatoPantalla;
 import com.textilesandinos.sigpt.negocio.reportes.formato.FormatoPdf;
 import com.textilesandinos.sigpt.negocio.reportes.formato.EstrategiaFormato;
+import com.textilesandinos.sigpt.negocio.reportes.modelo.FiltroReporte;
 import com.textilesandinos.sigpt.negocio.reportes.modelo.FiltrosReporte;
 import com.textilesandinos.sigpt.negocio.reportes.modelo.ResultadoReporte;
 
@@ -42,6 +43,22 @@ public class ReporteLN {
     /** Formatos de salida disponibles. */
     public List<FormatoSalida> listarFormatos() {
         return reporteDAO.listarFormatos();
+    }
+
+    /** Titulo del reporte, tal como lo declara su clase. */
+    public String titulo(String codigo) {
+        return fabrica.porCodigo(codigo).titulo();
+    }
+
+    /**
+     * Filtros que el reporte aplica de verdad sobre sus datos.
+     *
+     * <p>La pantalla muestra solo esos controles, de modo que ningun filtro
+     * visible quede sin efecto.
+     */
+    public List<FiltroReporte> filtrosSoportados(String codigo) {
+        List<FiltroReporte> soportados = fabrica.porCodigo(codigo).calculo().filtrosSoportados();
+        return soportados == null ? List.of(FiltroReporte.values()) : soportados;
     }
 
     /** Historial de reportes generados. */

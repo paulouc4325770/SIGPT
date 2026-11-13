@@ -2,6 +2,7 @@ package com.textilesandinos.sigpt.negocio.reportes.calculo;
 
 import java.util.List;
 
+import com.textilesandinos.sigpt.negocio.reportes.modelo.FiltroReporte;
 import com.textilesandinos.sigpt.negocio.reportes.modelo.FiltrosReporte;
 import com.textilesandinos.sigpt.negocio.reportes.modelo.Indicador;
 
@@ -19,6 +20,17 @@ public interface CalculoReporte {
 
     /** Columnas de la tabla de detalle. */
     List<String> columnas();
+
+    /**
+     * Filtros que esta estrategia aplica realmente sobre sus datos.
+     *
+     * <p>La pantalla solo muestra esos controles: asi el usuario no elige un
+     * criterio que el reporte va a ignorar.
+     */
+    default List<FiltroReporte> filtrosSoportados() {
+        return List.of(FiltroReporte.CLIENTE, FiltroReporte.OPERARIO,
+                FiltroReporte.MAQUINA, FiltroReporte.FECHAS);
+    }
 
     /** Filas del detalle, ya filtradas. */
     List<List<Object>> filas(FiltrosReporte filtros);

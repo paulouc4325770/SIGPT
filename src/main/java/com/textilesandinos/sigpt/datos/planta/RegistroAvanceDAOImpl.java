@@ -3,6 +3,8 @@ package com.textilesandinos.sigpt.datos.planta;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,6 +79,22 @@ public class RegistroAvanceDAOImpl extends DaoBase implements RegistroAvanceDAO 
                         + "id_avance DESC",
                 List.of(ParametroSql.entero("id_orden_produccion", idOrdenProduccion)),
                 RegistroAvanceDAOImpl::mapear);
+    }
+
+    @Override
+    public List<RegistroAvance> listarEntreFechas(LocalDate desde, LocalDate hasta) {
+        String sql = SQL_BUSCAR + "WHERE 1 = 1 ";
+        List<ParametroSql> parametros = new ArrayList<>();
+        if (desde != null) {
+            sql += "AND fecha >= ? ";
+            parametros.add(ParametroSql.fecha("desde", Date.valueOf(desde)));
+        }
+        if (hasta != null) {
+            sql += "AND fecha <= ? ";
+            parametros.add(ParametroSql.fecha("hasta", Date.valueOf(hasta)));
+        }
+        sql += "ORDER BY fecha DESC, id_avance DESC";
+        return consultarLista(sql, parametros, RegistroAvanceDAOImpl::mapear);
     }
 
     @Override

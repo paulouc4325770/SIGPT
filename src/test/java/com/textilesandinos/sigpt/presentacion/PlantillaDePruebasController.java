@@ -54,6 +54,7 @@ import com.textilesandinos.sigpt.negocio.pedidos.PedidoFormulario;
 import com.textilesandinos.sigpt.negocio.planta.AsignacionFormulario;
 import com.textilesandinos.sigpt.negocio.planta.AvanceFormulario;
 import com.textilesandinos.sigpt.negocio.planta.InspeccionFormulario;
+import com.textilesandinos.sigpt.negocio.reportes.modelo.FiltrosReporte;
 
 /**
  * Controlador auxiliar SOLO para pruebas: renderiza cada plantilla con un modelo
@@ -432,6 +433,19 @@ public class PlantillaDePruebasController {
         atributos.put("columnas", List.of("Codigo", "Cliente", "Metros"));
         atributos.put("filas", List.of(List.of("PED-2026-001", "Marca Andina", "3500")));
         atributos.put("indicadores", List.of());
+
+        FiltrosReporte filtros = new FiltrosReporte();
+        filtros.setIdCliente(1);
+        filtros.setFechaDesde(LocalDate.of(2026, 12, 1));
+        atributos.put("filtros", filtros);
+        atributos.put("verFiltroCliente", true);
+        atributos.put("verFiltroOperario", true);
+        atributos.put("verFiltroMaquina", true);
+        atributos.put("verFiltroFechas", true);
+        atributos.put("urlExportarPdf",
+                "/reportes/avance-pedidos/exportar?formato=PDF&idCliente=1&desde=2026-12-01");
+        atributos.put("urlExportarExcel",
+                "/reportes/avance-pedidos/exportar?formato=EXCEL&idCliente=1&desde=2026-12-01");
 
         return atributos;
     }

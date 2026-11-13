@@ -16,6 +16,7 @@ import com.textilesandinos.sigpt.datos.planta.TurnoDAO;
 import com.textilesandinos.sigpt.entidades.planta.Asignacion;
 import com.textilesandinos.sigpt.entidades.planta.OrdenFila;
 import com.textilesandinos.sigpt.entidades.planta.RegistroAvance;
+import com.textilesandinos.sigpt.negocio.reportes.modelo.FiltroReporte;
 import com.textilesandinos.sigpt.negocio.reportes.modelo.FiltrosReporte;
 import com.textilesandinos.sigpt.negocio.reportes.modelo.Indicador;
 
@@ -49,6 +50,11 @@ public class CalculoProductividad implements CalculoReporte {
     }
 
     @Override
+    public List<FiltroReporte> filtrosSoportados() {
+        return List.of(FiltroReporte.OPERARIO, FiltroReporte.MAQUINA, FiltroReporte.FECHAS);
+    }
+
+    @Override
     public List<String> columnas() {
         return List.of("Operario", "Maquina", "Turno", "Metros producidos", "Horas",
                 "Metros por hora");
@@ -59,6 +65,9 @@ public class CalculoProductividad implements CalculoReporte {
         List<List<Object>> filas = new ArrayList<>();
         for (OrdenFila orden : ordenDAO.listarEnProduccion()) {
             for (Asignacion asignacion : asignacionDAO.listarPorOrden(orden.getIdOrden())) {
+                if (!filtros.enRango(asignacion.getFecha())) {
+                    continue;
+                }
                 if (filtros.getIdOperario() != null
                         && !filtros.getIdOperario().equals(asignacion.getIdOperario())) {
                     continue;
@@ -68,13 +77,15 @@ public class CalculoProductividad implements CalculoReporte {
                     continue;
                 }
                 BigDecimal metros = BigDecimal.ZERO;
-                BigDecimal horas = BigDecimal.ZERO;
                 for (RegistroAvance avance : avanceDAO.listarPorAsignacion(
                         asignacion.getIdAsignacion())) {
-                    metros = metros.add(avance.getMetrosProducidos());
-                    horas = horas.add(asignacion.getHorasAsignadas() == null ? BigDecimal.ZERO
-                            : asignacion.getHorasAsignadas());
+                    metros = metros.add(avance.getMetrosProducidos() == null ? BigDecimal.ZERO
+                            : avance.getMetrosProducidos());
                 }
+                // Las horas son de la asignacion, no de cada avance: si un turno
+                // registra varios avances, no se pueden sumar varias veces.
+                BigDecimal horas = asignacion.getHorasAsignadas() == null ? BigDecimal.ZERO
+                        : asignacion.getHorasAsignadas();
                 BigDecimal metrosHora = horas.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO
                         : metros.divide(horas, 2, RoundingMode.HALF_UP);
                 filas.add(List.of(codigoOperario(asignacion.getIdOperario()),

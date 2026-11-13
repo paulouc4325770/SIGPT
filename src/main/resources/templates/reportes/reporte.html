@@ -16,50 +16,64 @@
           <div class="card-header">Filtros</div>
           <div class="card-body">
             <form method="get" th:action="@{${rutaReporte}}">
-              <div class="mb-3">
+              <div class="mb-3" th:if="${verFiltroCliente}">
                 <label class="form-label" for="idClienteFiltro">Cliente</label>
                 <select class="form-select" id="idClienteFiltro" name="idCliente">
-                  <option value="">Todos</option>
+                  <option value="" th:selected="${filtros.idCliente == null}">Todos</option>
                   <option th:each="c : ${clientes}" th:value="${c.idCliente}"
-                          th:text="${c.razonSocial}">Cliente</option>
+                          th:text="${c.razonSocial}"
+                          th:selected="${c.idCliente == filtros.idCliente}">Cliente</option>
                 </select>
               </div>
-              <div class="mb-3">
+              <div class="mb-3" th:if="${verFiltroOperario}">
                 <label class="form-label" for="idOperarioFiltro">Operario</label>
                 <select class="form-select" id="idOperarioFiltro" name="idOperario">
-                  <option value="">Todos</option>
+                  <option value="" th:selected="${filtros.idOperario == null}">Todos</option>
                   <option th:each="o : ${operarios}" th:value="${o.idOperario}"
-                          th:text="${o.codigo + ' - ' + o.nombres}">OP-001</option>
+                          th:text="${o.codigo + ' - ' + o.nombres}"
+                          th:selected="${o.idOperario == filtros.idOperario}">OP-001</option>
                 </select>
               </div>
-              <div class="mb-3">
+              <div class="mb-3" th:if="${verFiltroMaquina}">
                 <label class="form-label" for="idMaquinaFiltro">Maquina</label>
                 <select class="form-select" id="idMaquinaFiltro" name="idMaquina">
-                  <option value="">Todas</option>
+                  <option value="" th:selected="${filtros.idMaquina == null}">Todas</option>
                   <option th:each="m : ${maquinas}" th:value="${m.idMaquina}"
-                          th:text="${m.codigo}">TC-001</option>
+                          th:text="${m.codigo}"
+                          th:selected="${m.idMaquina == filtros.idMaquina}">TC-001</option>
                 </select>
               </div>
-              <div class="mb-3">
+              <div class="mb-3" th:if="${verFiltroFechas}">
                 <label class="form-label" for="desdeFiltro">Desde</label>
-                <input type="date" class="form-control" id="desdeFiltro" name="desde">
+                <input type="date" class="form-control" id="desdeFiltro" name="desde"
+                       th:value="${filtros.fechaDesde}">
               </div>
-              <div class="mb-3">
+              <div class="mb-3" th:if="${verFiltroFechas}">
                 <label class="form-label" for="hastaFiltro">Hasta</label>
-                <input type="date" class="form-control" id="hastaFiltro" name="hasta">
+                <input type="date" class="form-control" id="hastaFiltro" name="hasta"
+                       th:value="${filtros.fechaHasta}">
+              </div>
+              <div class="alert alert-secondary py-2 small"
+                   th:if="${!verFiltroCliente and !verFiltroOperario and !verFiltroMaquina and !verFiltroFechas}">
+                Este reporte no admite filtros.
               </div>
               <button type="submit" class="btn btn-primary w-100">Generar Reporte</button>
+              <a class="btn btn-link btn-sm w-100 mt-1" th:href="@{${rutaReporte}}"
+                 th:if="${filtros.hayFiltros()}">Limpiar filtros</a>
             </form>
 
             <hr>
             <p class="small text-muted mb-2">Exportar el resultado</p>
             <div class="btn-group btn-group-sm w-100">
-              <a class="btn btn-outline-secondary"
-                 th:href="@{${rutaReporte} + '/exportar?formato=PDF'}">PDF</a>
-              <a class="btn btn-outline-secondary"
-                 th:href="@{${rutaReporte} + '/exportar?formato=EXCEL'}">
-                Excel</a>
+              <a class="btn btn-outline-secondary" th:href="${urlExportarPdf}">PDF</a>
+              <a class="btn btn-outline-secondary" th:href="${urlExportarExcel}">Excel</a>
             </div>
+            <p class="small text-muted mt-2 mb-0" th:if="${!filtros.hayFiltros()}">
+              Sin filtros: se exporta el reporte completo.
+            </p>
+            <p class="small text-muted mt-2 mb-0" th:if="${filtros.hayFiltros()}">
+              La exportacion conserva los filtros aplicados.
+            </p>
           </div>
         </div>
       </div>

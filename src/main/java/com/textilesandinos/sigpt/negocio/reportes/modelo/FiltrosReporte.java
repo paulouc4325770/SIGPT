@@ -62,6 +62,52 @@ public class FiltrosReporte {
         this.codUsuario = codUsuario;
     }
 
+    /** Indica si la fecha cae dentro del rango pedido (sin rango, todo entra). */
+    public boolean enRango(LocalDate fecha) {
+        if (fechaDesde == null && fechaHasta == null) {
+            return true;
+        }
+        if (fecha == null) {
+            return false;
+        }
+        if (fechaDesde != null && fecha.isBefore(fechaDesde)) {
+            return false;
+        }
+        return fechaHasta == null || !fecha.isAfter(fechaHasta);
+    }
+
+    /** Indica si hay algun criterio aplicado. */
+    public boolean hayFiltros() {
+        return idCliente != null || idOperario != null || idMaquina != null
+                || fechaDesde != null || fechaHasta != null;
+    }
+
+    /**
+     * Los filtros como cadena de consulta ({@code &idCliente=2&desde=...}).
+     *
+     * <p>Se usa para que los enlaces de exportacion conserven los criterios con
+     * los que se genero el reporte en pantalla.
+     */
+    public String comoConsulta() {
+        StringBuilder consulta = new StringBuilder();
+        if (idCliente != null) {
+            consulta.append("&idCliente=").append(idCliente);
+        }
+        if (idOperario != null) {
+            consulta.append("&idOperario=").append(idOperario);
+        }
+        if (idMaquina != null) {
+            consulta.append("&idMaquina=").append(idMaquina);
+        }
+        if (fechaDesde != null) {
+            consulta.append("&desde=").append(fechaDesde);
+        }
+        if (fechaHasta != null) {
+            consulta.append("&hasta=").append(fechaHasta);
+        }
+        return consulta.toString();
+    }
+
     /** Texto de los filtros, para guardarlos en el historial. */
     public String resumir() {
         StringBuilder texto = new StringBuilder();

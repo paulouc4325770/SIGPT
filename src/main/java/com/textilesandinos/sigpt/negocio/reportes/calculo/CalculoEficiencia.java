@@ -12,6 +12,7 @@ import com.textilesandinos.sigpt.datos.planta.AsignacionDAO;
 import com.textilesandinos.sigpt.entidades.pedidos.OrdenProduccion;
 import com.textilesandinos.sigpt.entidades.planta.Asignacion;
 import com.textilesandinos.sigpt.entidades.planta.OrdenFila;
+import com.textilesandinos.sigpt.negocio.reportes.modelo.FiltroReporte;
 import com.textilesandinos.sigpt.negocio.reportes.modelo.FiltrosReporte;
 import com.textilesandinos.sigpt.negocio.reportes.modelo.Indicador;
 
@@ -36,6 +37,11 @@ public class CalculoEficiencia implements CalculoReporte {
     }
 
     @Override
+    public List<FiltroReporte> filtrosSoportados() {
+        return List.of(FiltroReporte.FECHAS);
+    }
+
+    @Override
     public List<String> columnas() {
         return List.of("Orden", "Horas maquina previstas", "Horas maquina real", "Eficiencia",
                 "Horas hombre previstas", "Horas hombre real", "Metros");
@@ -47,6 +53,10 @@ public class CalculoEficiencia implements CalculoReporte {
         for (OrdenFila orden : ordenDAO.listarEnProduccion()) {
             OrdenProduccion completa = ordenDAO.buscarPorId(orden.getIdOrden()).orElse(null);
             if (completa == null) {
+                continue;
+            }
+            // El periodo se aplica sobre la fecha de inicio de la orden.
+            if (!filtros.enRango(completa.getFechaInicio())) {
                 continue;
             }
             BigDecimal horasReales = BigDecimal.ZERO;

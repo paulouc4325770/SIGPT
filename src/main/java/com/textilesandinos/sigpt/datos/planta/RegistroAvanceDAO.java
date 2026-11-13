@@ -1,5 +1,6 @@
 package com.textilesandinos.sigpt.datos.planta;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +19,9 @@ public interface RegistroAvanceDAO {
 
     /** Lista los avances de una orden de produccion. */
     List<RegistroAvance> listarPorOrden(int idOrdenProduccion);
+
+    /** Lista los avances registrados entre dos fechas (cualquiera puede ser nula). */
+    List<RegistroAvance> listarEntreFechas(LocalDate desde, LocalDate hasta);
 
     /** Lista los avances de una asignacion, del mas reciente al mas antiguo. */
     List<RegistroAvance> listarPorAsignacion(int idAsignacion);
