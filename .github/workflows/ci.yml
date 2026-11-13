@@ -1,14 +1,48 @@
 name: CI SIGPT
 
+# RDS3: integracion continua en cada push y cada pull request.
+# Se listan main y master porque el repositorio conserva ambas ramas.
 on:
   push:
-    branches: [ main ]
+    branches: [ main, master ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, master ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    # MySQL 8.0 real. Las pruebas de contexto, de plantillas y de seguridad
+    # leen el esquema y los datos semilla, igual que en la maquina del alumno:
+    # sin base de datos el arranque de Spring falla (ParametrosNegocio lee la
+    # tabla `parametro` en su @PostConstruct).
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ci_root_2026
+          MYSQL_DATABASE: sigpt
+          MYSQL_USER: sigpt_app
+          MYSQL_PASSWORD: ci_sigpt_2026
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -pci_root_2026 --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
+
+    env:
+      # Credenciales EFIMERAS del contenedor de CI (no son secretos reales:
+      # el contenedor se destruye al terminar el job). La aplicacion las lee
+      # desde application.properties con ${SIGPT_DB_...}.
+      SIGPT_DB_HOST: 127.0.0.1
+      SIGPT_DB_PORT: 3306
+      SIGPT_DB_NAME: sigpt
+      SIGPT_DB_USER: sigpt_app
+      SIGPT_DB_PASSWORD: ci_sigpt_2026
+      MYSQL_PWD: ci_root_2026
 
     steps:
       - uses: actions/checkout@v4
@@ -20,7 +54,31 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Verificar formato y compilacion
+      - name: Cargar el esquema y los datos de prueba
+        run: |
+          set -euo pipefail
+          if ! command -v mysql >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq mysql-client
+          fi
+          for intento in $(seq 1 30); do
+            if mysqladmin ping -h 127.0.0.1 -P 3306 -u root --silent; then
+              echo "MySQL disponible tras $intento intento(s)."
+              break
+            fi
+            echo "Esperando a MySQL... ($intento)"
+            sleep 2
+          done
+          mysql -h 127.0.0.1 -P 3306 -u root --default-character-set=utf8mb4 sigpt < src/main/resources/db/schema.sql
+          mysql -h 127.0.0.1 -P 3306 -u root --default-character-set=utf8mb4 sigpt < src/main/resources/db/seed.sql
+          tablas=$(mysql -h 127.0.0.1 -P 3306 -u root -N -B -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'sigpt'")
+          echo "Tablas creadas: $tablas"
+          if [ "$tablas" -lt 30 ]; then
+            echo "El esquema no se cargo por completo." >&2
+            exit 1
+          fi
+
+      - name: Compilar y ejecutar las pruebas
         run: mvn -B -ntp clean verify
 
       - name: Comprobar que el esquema SQL es coherente
@@ -29,7 +87,15 @@ jobs:
           grep -q "CREATE TABLE movimiento_kardex" src/main/resources/db/schema.sql
           echo "Esquema SQL correcto"
 
-      - name: Publicar artefacto
+      - name: Publicar el informe de pruebas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: informe-pruebas
+          path: target/surefire-reports/
+          if-no-files-found: ignore
+
+      - name: Publicar el artefacto
         if: github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
         with:

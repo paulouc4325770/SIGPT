@@ -1,5 +1,7 @@
 # SIGPT — Sistema Integral de Gestión de Producción Textil
 
+[![CI SIGPT](https://github.com/paulouc4325770/SIGPT/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/paulouc4325770/SIGPT/actions/workflows/ci.yml)
+
 **Textiles Andinos S.A.C.** · UNMSM – FISI · Grupo N.º 4
 
 Sistema web para la gestión integral de pedidos textiles, el abastecimiento de
@@ -190,7 +192,7 @@ cambiarlos sin recompilar.
 | Documento | Ubicación |
 |---|---|
 | Documento de arquitectura (vistas 4+1) | `docs/Documento-de-Arquitectura.md` |
-| Decisiones de diseño D1–D10 | `D:\Diseño\SIGPT_Decisiones_de_Diseno.md` |
+| Decisiones de diseño D1–D10 | `docs/Decisiones-de-Diseno.md` |
 | Cierre técnico (revisión OWASP, carga y despliegue) | `docs/cierre-tecnico.md` |
 | Plan de pruebas de carga (JMeter) | `docs/pruebas-carga/plan-carga-sigpt.jmx` |
 | Script de pruebas de carga (Python) | `scripts/prueba-carga.py` |
@@ -258,14 +260,20 @@ done
 | `CalidadLNTest` | 4 | **RD7** (tolerancia de la ficha técnica), **R-Merma** (la merma no avanza el pedido), cierre de lote |
 | `FabricaEstadoPedidoTest` | 5 | **State**: transiciones válidas del ciclo de vida del pedido |
 | `SeguridadLNTest` | 7 | Autenticación, intentos fallidos, bloqueo, usuario inactivo, no revelar cuentas |
-| `PruebasPlantillasTest` | 31 | Render de las 13 plantillas, sin contenido duplicado, filtro de permisos en cada petición |
+| `SeguridadAdminLNTest` | 5 | Alta de usuarios y perfiles, opciones del menú, auditoría de cambios |
+| `PruebasPlantillasTest` | 53 | Render de las 24 pantallas, sin contenido duplicado, filtro de permisos en cada petición |
 | `HashHelperTest` | 6 | Hash PBKDF2, salt por usuario, rechazo de clave vacía |
 | `MenuHelperTest` | 5 | Agrupación del menú, control de acceso por ruta y subruta |
 | `SigptApplicationTests` | 2 | Arranque del contexto de Spring |
 | `InsumoLNTest` | 5 | **RD5** (MSDS obligatoria en químicos y tintes), proveedor inactivo |
 | `KardexLNTest` | 4 | Control de stock y **RD4** (varianza de consumo frente al teórico) |
 | `ReporteLNTest` | 7 | **Template Method**, **Bridge** y **Strategy** de los reportes |
-| **Total** | **105** | `mvn clean verify` |
+| **Total** | **122** | `mvn clean verify` |
+
+La integración continua (`.github/workflows/ci.yml`) levanta un **MySQL 8.0**
+en un contenedor, aplica `schema.sql` + `seed.sql` y ejecuta `mvn clean verify`
+en cada push y cada pull request. El estado se ve en la insignia del inicio y en
+la pestaña **Actions** del repositorio.
 
 ---
 
