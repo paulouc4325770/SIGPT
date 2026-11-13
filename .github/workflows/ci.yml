@@ -79,7 +79,17 @@ jobs:
           fi
 
       - name: Compilar y ejecutar las pruebas
-        run: mvn -B -ntp clean verify
+        run: |
+          set -o pipefail
+          mvn -B -ntp clean verify 2>&1 | tee maven-build.log
+
+      - name: Resumir el fallo
+        if: failure()
+        run: |
+          if [ -f maven-build.log ]; then
+            grep -E "\[ERROR\]|BUILD FAILURE|Tests run:.*(Failures: [1-9]|Errors: [1-9])" \
+              maven-build.log | head -40 | sed 's/^/::error::/'
+          fi
 
       - name: Comprobar que el esquema SQL es coherente
         run: |
@@ -92,7 +102,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: informe-pruebas
-          path: target/surefire-reports/
+          path: |
+            target/surefire-reports/
+            maven-build.log
           if-no-files-found: ignore
 
       - name: Publicar el artefacto
