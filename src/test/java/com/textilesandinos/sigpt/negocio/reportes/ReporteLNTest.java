@@ -30,6 +30,7 @@ import com.textilesandinos.sigpt.negocio.comun.ReglaNegocioException;
 import com.textilesandinos.sigpt.negocio.reportes.calculo.CalculoReporte;
 import com.textilesandinos.sigpt.negocio.reportes.formato.EstrategiaFormato;
 import com.textilesandinos.sigpt.negocio.reportes.formato.FormatoPantalla;
+import com.textilesandinos.sigpt.negocio.reportes.modelo.FiltroReporte;
 import com.textilesandinos.sigpt.negocio.reportes.modelo.FiltrosReporte;
 import com.textilesandinos.sigpt.negocio.reportes.modelo.Indicador;
 import com.textilesandinos.sigpt.negocio.reportes.modelo.ResultadoReporte;
@@ -137,6 +138,25 @@ class ReporteLNTest {
         fachada();
         assertThat(reporte.calculo()).isSameAs(calculo);
         assertThat(reporte.calculo().columnas()).containsExactly("Codigo", "Cliente");
+    }
+
+    @Test
+    @DisplayName("filtrosSoportados: la fachada publica solo los filtros de la estrategia")
+    void filtrosSoportadosDelegaEnLaEstrategia() {
+        when(calculo.filtrosSoportados()).thenReturn(
+                List.of(FiltroReporte.CLIENTE, FiltroReporte.FECHAS));
+
+        assertThat(fachada().filtrosSoportados("AVANCE_PEDIDOS"))
+                .containsExactly(FiltroReporte.CLIENTE, FiltroReporte.FECHAS);
+    }
+
+    @Test
+    @DisplayName("filtrosSoportados: sin declaracion explicita se ofrecen todos")
+    void filtrosSoportadosSinDeclaracion() {
+        when(calculo.filtrosSoportados()).thenReturn(null);
+
+        assertThat(fachada().filtrosSoportados("AVANCE_PEDIDOS"))
+                .containsExactly(FiltroReporte.values());
     }
 
     @Test
