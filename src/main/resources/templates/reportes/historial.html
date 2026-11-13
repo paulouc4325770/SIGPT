@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head(${titulo})}"></head>
+<body>
+<div th:replace="~{layout :: layout(~{::contenido})}">
+  <div th:fragment="contenido">
+    <h2 class="titulo-pantalla" th:text="${titulo}">Historial de Reportes</h2>
+
+    <div class="alert alert-info" th:if="${mensajeSinDatos}" th:text="${mensajeSinDatos}"></div>
+
+    <div class="card">
+      <div class="card-header">Reportes generados</div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+          <tr><th>Reporte</th><th>Usuario</th><th>Formato</th><th>Filtros</th>
+            <th>Fecha</th></tr>
+          </thead>
+          <tbody>
+          <tr th:each="g : ${generados}">
+            <td th:text="${g.idReporte}">1</td>
+            <td th:text="${g.codUsuario}">jperez</td>
+            <td th:text="${g.formatoSalida}">PANTALLA</td>
+            <td class="small" th:text="${g.filtros}"></td>
+            <td th:text="${g.fechaGeneracion}">2026-11-12</td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(generados)}">
+            <td colspan="5" class="text-center text-muted py-4">
+              Todavia no se ha generado ningun reporte.
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

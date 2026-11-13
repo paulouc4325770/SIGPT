@@ -191,6 +191,9 @@ cambiarlos sin recompilar.
 |---|---|
 | Documento de arquitectura (vistas 4+1) | `docs/Documento-de-Arquitectura.md` |
 | Decisiones de diseño D1–D10 | `D:\Diseño\SIGPT_Decisiones_de_Diseno.md` |
+| Cierre técnico (revisión OWASP, carga y despliegue) | `docs/cierre-tecnico.md` |
+| Plan de pruebas de carga (JMeter) | `docs/pruebas-carga/plan-carga-sigpt.jmx` |
+| Script de pruebas de carga (Python) | `scripts/prueba-carga.py` |
 | **20 diagramas** (12 propios + 8 del Modelo de Negocio) | `docs/diagramas/` |
 | Fuente editable de los diagramas | `docs/diagramas/*.mmd` (Mermaid) |
 | Esquema de base de datos | `src/main/resources/db/schema.sql` |
@@ -214,7 +217,7 @@ done
 |---|---|---|
 | E1 | Base de datos, esqueleto de código, módulo de seguridad, vistas, diagramas | **Completo** |
 | E2 | Pedidos (EF-1001-3), clientes (EF-1001-4) y planta (EF-1001-6, EF-1001-7) | **Completo** |
-| E3 | Abastecimiento (EF-1001-5), reportes (EF-1001-8) y cierre técnico | Pendiente |
+| E3 | Abastecimiento (EF-1001-5), reportes (EF-1001-8) y cierre técnico | **Completo** |
 
 ### Pantallas de E2
 
@@ -228,6 +231,21 @@ done
 | Asignación de operarios y maquinaria | `/planta/asignacion` | Supervisor |
 | Terminal táctil de registro de avance | `/planta/avance` | Operario / Supervisor |
 | Control de calidad, cierre de lote y parte diario | `/planta/calidad` | Supervisor |
+
+### Pantallas de E3
+
+| Pantalla | Ruta | Perfil |
+|---|---|---|
+| Padrón de proveedores | `/abastecimiento/proveedores` | Jefe de Logística |
+| Catálogo de insumos (con MSDS y alerta de stock mínimo) | `/abastecimiento/insumos` | Jefe de Logística |
+| Solicitudes de cotización a proveedores (RFQ) | `/abastecimiento/rfq` | Jefe de Logística |
+| Órdenes de compra (con PDF y envío al proveedor) | `/abastecimiento/ordenes-compra` | Jefe de Logística |
+| Kardex de insumos | `/abastecimiento/kardex` | Jefe de Logística / Almacén |
+| Avance de pedidos | `/reportes/avance-pedidos` | Jefe de Producción / Gerencia |
+| Productividad | `/reportes/productividad` | Jefe de Producción / Gerencia |
+| Consumo de insumos y merma | `/reportes/consumo-merma` | Jefe de Producción / Gerencia |
+| Eficiencia industrial | `/reportes/eficiencia` | Jefe de Producción / Gerencia |
+| Historial de reportes | `/reportes/historial` | Jefe de Producción / Gerencia |
 
 ### Pruebas actuales
 
@@ -244,7 +262,10 @@ done
 | `HashHelperTest` | 6 | Hash PBKDF2, salt por usuario, rechazo de clave vacía |
 | `MenuHelperTest` | 5 | Agrupación del menú, control de acceso por ruta y subruta |
 | `SigptApplicationTests` | 2 | Arranque del contexto de Spring |
-| **Total** | **79** | `mvn clean verify` |
+| `InsumoLNTest` | 5 | **RD5** (MSDS obligatoria en químicos y tintes), proveedor inactivo |
+| `KardexLNTest` | 4 | Control de stock y **RD4** (varianza de consumo frente al teórico) |
+| `ReporteLNTest` | 7 | **Template Method**, **Bridge** y **Strategy** de los reportes |
+| **Total** | **105** | `mvn clean verify` |
 
 ---
 

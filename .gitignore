@@ -43,3 +43,7 @@ temp/
 *.tmp
 *.bak
 *.orig
+
+# ---- Archivos generados en ejecucion (PDF de ordenes, envios, MSDS) ----
+/data/
+/resultados/

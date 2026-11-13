@@ -39,7 +39,7 @@ public class InterceptorPermisos implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest peticion, HttpServletResponse respuesta,
             Object manejador) throws java.io.IOException {
-        String ruta = peticion.getRequestURI();
+        String ruta = rutaEfectiva(peticion);
         String contexto = peticion.getContextPath();
         if (contexto != null && !contexto.isEmpty() && ruta.startsWith(contexto)) {
             ruta = ruta.substring(contexto.length());
@@ -61,6 +61,23 @@ public class InterceptorPermisos implements HandlerInterceptor {
         }
 
         return true;
+    }
+
+    /**
+     * Ruta efectiva de la peticion, sin los parametros de ruta.
+     *
+     * <p>Cuando el cliente no envia la cookie de sesion, el contenedor reescribe
+     * la URL y anade {@code ;jsessionid=...}. Ese sufijo no forma parte de la
+     * opcion de menu, asi que se quita antes de comparar: de lo contrario el
+     * usuario recibiria un 403 inexplicable.
+     */
+    private String rutaEfectiva(HttpServletRequest peticion) {
+        String ruta = peticion.getRequestURI();
+        int puntoYComa = ruta.indexOf(';');
+        if (puntoYComa >= 0) {
+            ruta = ruta.substring(0, puntoYComa);
+        }
+        return ruta;
     }
 
     private boolean esPublica(String ruta) {

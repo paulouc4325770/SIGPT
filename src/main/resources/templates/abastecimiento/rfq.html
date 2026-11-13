@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head(${titulo})}"></head>
+<body>
+<div th:replace="~{layout :: layout(~{::contenido})}">
+  <div th:fragment="contenido">
+    <h2 class="titulo-pantalla" th:text="${titulo}">Solicitudes de Cotizacion</h2>
+
+    <div class="alert alert-success" th:if="${mensajeExito}" th:text="${mensajeExito}"></div>
+    <div class="alert alert-danger" th:if="${mensajeError}" th:text="${mensajeError}"></div>
+    <div class="alert alert-info" th:if="${mensajeSinDatos}" th:text="${mensajeSinDatos}"></div>
+
+    <div class="row g-3">
+      <div class="col-12 col-lg-4">
+        <div class="card mb-3">
+          <div class="card-header">Emitir solicitud (RFQ)</div>
+          <div class="card-body">
+            <form th:action="@{/abastecimiento/rfq/guardar}" method="post"
+                  th:object="${solicitudForm}">
+              <div class="mb-3">
+                <label class="form-label" for="idOrdenProduccion">Orden de Produccion</label>
+                <input type="number" class="form-control" id="idOrdenProduccion"
+                       th:field="*{idOrdenProduccion}" required>
+                <div class="form-text">Identificador de la orden que origina la compra.</div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="fechaEmision">Fecha de emision</label>
+                <input type="date" class="form-control" id="fechaEmision"
+                       th:field="*{fechaEmision}">
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="observaciones">Observaciones</label>
+                <textarea class="form-control" id="observaciones" rows="2"
+                          th:field="*{observaciones}"></textarea>
+              </div>
+              <div class="d-flex gap-2 justify-content-end">
+                <button type="submit" class="btn btn-primary">Emitir solicitud</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">Registrar cotizacion de proveedor</div>
+          <div class="card-body">
+            <form th:action="@{/abastecimiento/rfq/cotizacion}" method="post"
+                  th:object="${cotizacionForm}">
+              <div class="mb-3">
+                <label class="form-label" for="idSolicitud">Solicitud</label>
+                <input type="number" class="form-control" id="idSolicitud"
+                       th:field="*{idSolicitud}" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="idProveedor">Proveedor</label>
+                <select class="form-select" id="idProveedor" th:field="*{idProveedor}" required>
+                  <option value="">Seleccione</option>
+                  <option th:each="p : ${proveedores}" th:value="${p.idProveedor}"
+                          th:text="${p.codigo + ' - ' + p.razonSocial}">PRV-001</option>
+                </select>
+              </div>
+              <div class="row g-2 mb-3">
+                <div class="col-6">
+                  <label class="form-label" for="precioUnitario">Precio unitario</label>
+                  <input type="number" step="0.0001" min="0" class="form-control"
+                         id="precioUnitario" th:field="*{precioUnitario}" required>
+                </div>
+                <div class="col-6">
+                  <label class="form-label" for="unidad">Unidad</label>
+                  <select class="form-select" id="unidad" th:field="*{unidad}">
+                    <option value="KG">KG</option>
+                    <option value="L">L</option>
+                    <option value="UND">UND</option>
+                  </select>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="tiempoEntregaDias">Tiempo de entrega (dias)</label>
+                <input type="number" min="0" class="form-control" id="tiempoEntregaDias"
+                       th:field="*{tiempoEntregaDias}">
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="certificaciones">Certificaciones</label>
+                <input type="text" class="form-control" id="certificaciones"
+                       th:field="*{certificaciones}" placeholder="GOTS, OEKO-TEX">
+              </div>
+              <div class="d-flex gap-2 justify-content-end">
+                <button type="submit" class="btn btn-primary">Registrar cotizacion</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-8">
+        <div class="card mb-3">
+          <div class="card-header">Solicitudes emitidas</div>
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+              <tr><th>Codigo</th><th>Orden</th><th>Emision</th><th>Estado</th><th></th></tr>
+              </thead>
+              <tbody>
+              <tr th:each="s : ${solicitudes}">
+                <td th:text="${s.codigo}">RFQ-2026-001</td>
+                <td th:text="${s.idOrdenProduccion}">1</td>
+                <td th:text="${s.fechaEmision}">2026-11-12</td>
+                <td>
+                  <span class="badge" th:classappend="${@clases.badge(s.estado)}"
+                        th:text="${s.estado}">EMITIDA</span>
+                </td>
+                <td class="text-end">
+                  <a class="btn btn-sm btn-outline-primary"
+                     th:href="@{'/abastecimiento/rfq?solicitud=' + ${s.idSolicitud}}">Cotizaciones</a>
+                </td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(solicitudes)}">
+                <td colspan="5" class="text-center text-muted py-4">
+                  No se encontraron datos para los criterios seleccionados.
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card" th:if="${solicitudSeleccionada != null}">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Cotizaciones recibidas</span>
+            <form th:action="@{/abastecimiento/rfq/adjudicar}" method="post">
+              <input type="hidden" name="idSolicitud" th:value="${solicitudSeleccionada}">
+              <button type="submit" class="btn btn-sm btn-success">Adjudicar mejor oferta</button>
+            </form>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+              <tr><th>Proveedor</th><th>Precio unitario</th><th>Unidad</th>
+                <th>Entrega (dias)</th><th>Certificaciones</th><th>Estado</th></tr>
+              </thead>
+              <tbody>
+              <tr th:each="c : ${cotizacionesProveedor}">
+                <td th:text="${c.idProveedor}">1</td>
+                <td th:text="${c.precioUnitario}">0</td>
+                <td th:text="${c.unidad}">KG</td>
+                <td th:text="${c.tiempoEntregaDias}">0</td>
+                <td th:text="${c.certificaciones}"></td>
+                <td>
+                  <span class="badge" th:classappend="${@clases.badge(c.estado)}"
+                        th:text="${c.estado}">RECIBIDA</span>
+                </td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(cotizacionesProveedor)}">
+                <td colspan="6" class="text-center text-muted py-4">
+                  Todavia no hay cotizaciones para esta solicitud.
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

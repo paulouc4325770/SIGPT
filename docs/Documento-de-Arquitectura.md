@@ -1384,6 +1384,10 @@ Workflow en cada PR: `mvn -B verify` (compila + unitarias + integración) → an
 | **CHG-08** | Las acciones de una pantalla (guardar, consultar, anular, exportar) se autorizan como **subrutas de la opcion de menu** correspondiente | **Aprobada** (D-P9) | El filtro de permisos acepta la ruta exacta de la opcion y sus subrutas; sin esto ninguna accion POST seria accesible |
 | **CHG-09** | **Todas las operaciones de E2 dejan traza** en `registro_auditoria` (modulos PEDIDOS y PLANTA) | **Aprobada** (D-P10) | `AuditoriaHelper` en cada LN; evidencia directa de OWASP A09 y de RC8 |
 
+| **CHG-10** | La **Orden de Compra se entrega en PDF** (OpenPDF) y se envia al proveedor mediante un **adaptador** de notificacion | **Aprobada** (decision del equipo en E3) | Se agrega OpenPDF 2.0.3 (MPL/LGPL); la interfaz `NotificadorOrdenCompra` permite cambiar el transporte sin tocar el dominio |
+| **CHG-11** | La **exportacion de reportes** vive bajo la URL de cada reporte (`/reportes/<reporte>/exportar`) | **Aprobada** (decision del equipo en E3) | El filtro de permisos solo autoriza la opcion de menu y sus subrutas; la ruta general `/reportes/exportar` quedaba fuera del permiso y devolvia 403 |
+| **CHG-12** | La **revision OWASP**, el **plan JMeter** y el **instructivo de despliegue** se documentan en el cierre tecnico | **Aprobada** (decision del equipo en E3) | `docs/cierre-tecnico.md`, `docs/pruebas-carga/plan-carga-sigpt.jmx` y `scripts/prueba-carga.py` |
+
 > Todas las solicitudes se registran en el tablero de seguimiento (GC‑1005, etapa 1) y las aprobadas se anexan al documento de requisitos en la próxima versión (F2 p.36, EF‑1001‑15).
 
 ### 12.2 Inconsistencias entre los documentos base
@@ -1417,6 +1421,10 @@ Workflow en cada PR: `mvn -B verify` (compila + unitarias + integración) → an
 | **D-P8** | Formato de exportacion de pedidos | **CSV y Excel (HTML)**; el PDF pasa a E3 | CHG-07; `ExportadorTabla` sin dependencias externas |
 | **D-P9** | Permisos de las acciones de pantalla | **Subruta de la opcion de menu** | CHG-08; `MenuHelper.tieneAcceso` acepta la ruta y sus subrutas |
 | **D-P10** | Auditoria de las operaciones de E2 | **Todas, sin excepcion** | CHG-09; cada LN registra su operacion con usuario, entidad y detalle |
+
+| **D-P11** | PDF de la orden de compra | **Si, con OpenPDF** | CHG-10; `GeneradorOrdenCompraPdf` y el adaptador `NotificadorOrdenCompra` |
+| **D-P12** | Pruebas de carga | **Plan JMeter + script propio en Python** | CHG-12; ambos miden el RNF01 (respuesta menor a 2 s) |
+| **D-P13** | Envio al proveedor | **Adaptador con implementacion por defecto en archivo** | CHG-10; sustituirlo por SMTP es entregar otra implementacion de la misma interfaz |
 
 ### 12.4 Supuestos declarados
 
@@ -1539,9 +1547,15 @@ Nunca se sacrifican: seguridad, pedidos con RD1 y RD2, y el terminal tactil de a
 | E2 | CalidadLN (RD7, R-Merma) | **Completo** | Inspeccion contra la tolerancia de la ficha tecnica, merma sin avance, cierre de lote y parte diario |
 | E2 | Auditoria | **Completo** | Todas las operaciones de PEDIDOS y PLANTA dejan traza en `registro_auditoria` |
 | E2 | Vistas | **Completo** | 13 plantillas (3 nuevas: consulta de pedido, cotizaciones y control de calidad) |
-| E2 | Pruebas | **Completo** | **79 pruebas** en verde: 5 de reglas de pedido, 5 de cotizacion, 4 de asignacion, 4 de avance, 4 de calidad, 5 del patron State, 31 de plantillas |
-| E2 | Verificacion en vivo | **Completo** | Ciclo completo probado contra la aplicacion en marcha: registrar -> cotizar -> adelanto -> produccion -> asignar -> avance -> calidad |
-| E3 | Abastecimiento, Reportes y cierre tecnico | Pendiente | Sprint 3 |
+| E2 | Pruebas | **Completo** | **79 pruebas** en verde |
+| E3 | ProveedorLN / InsumoLN | **Completo** | EF-1001-5: padron de proveedores y catalogo de insumos con **RD5** (MSDS) y **R-Stock** |
+| E3 | CotizacionProveedorLN | **Completo** | RFQ: emision de solicitud, recepcion de cotizaciones y adjudicacion por costo-beneficio-tiempo |
+| E3 | OrdenCompraLN | **Completo** | Emision con detalle, **PDF con OpenPDF**, envio al proveedor (adaptador), confirmacion y recepcion con ingresos al kardex |
+| E3 | KardexLN (RD4) | **Completo** | Movimientos con stock sincronizado en la misma transaccion y varianza de consumo frente al teorico |
+| E3 | Reportes gerenciales (EF-1001-8) | **Completo** | 4 reportes con **Template Method**, **Bridge** y **Strategy**; 3 formatos de salida e historial en `reporte_generado` |
+| E3 | Cierre tecnico | **Completo** | PDF de la OC, revision OWASP Top 10, plan JMeter y script de carga, instructivo de despliegue |
+| E3 | Pruebas | **Completo** | **105 pruebas** en verde |
+| E3 | Pruebas de carga | **Completo** | 600 peticiones con 20 usuarios concurrentes: p95 = 200 ms frente al limite de 2 000 ms del RNF01 |
 
 ### 14.7 Herramientas de apoyo
 

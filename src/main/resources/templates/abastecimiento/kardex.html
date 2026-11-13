@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head(${titulo})}"></head>
+<body>
+<div th:replace="~{layout :: layout(~{::contenido})}">
+  <div th:fragment="contenido">
+    <h2 class="titulo-pantalla" th:text="${titulo}">Kardex de Insumos</h2>
+
+    <div class="alert alert-success" th:if="${mensajeExito}" th:text="${mensajeExito}"></div>
+    <div class="alert alert-danger" th:if="${mensajeError}" th:text="${mensajeError}"></div>
+    <div class="alert alert-info" th:if="${mensajeSinDatos}" th:text="${mensajeSinDatos}"></div>
+
+    <div class="row g-3">
+      <div class="col-12 col-lg-4">
+        <div class="card h-100">
+          <div class="card-header">Registrar movimiento</div>
+          <div class="card-body">
+            <form th:action="@{/abastecimiento/kardex/guardar}" method="post"
+                  th:object="${kardexForm}">
+              <div class="mb-3">
+                <label class="form-label" for="idInsumo">Insumo</label>
+                <select class="form-select" id="idInsumo" th:field="*{idInsumo}" required>
+                  <option value="">Seleccione</option>
+                  <option th:each="i : ${insumos}" th:value="${i.idInsumo}"
+                          th:text="${i.codigo + ' - ' + i.nombre}">INS-FIB-001</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="tipoMovimiento">Tipo de movimiento</label>
+                <select class="form-select" id="tipoMovimiento" th:field="*{tipoMovimiento}"
+                        required>
+                  <option value="INGRESO">Ingreso (recepcion)</option>
+                  <option value="SALIDA">Salida (consumo en planta)</option>
+                  <option value="AJUSTE">Ajuste</option>
+                </select>
+              </div>
+              <div class="row g-2 mb-3">
+                <div class="col-6">
+                  <label class="form-label" for="cantidadMovimiento">Cantidad</label>
+                  <input type="number" step="0.01" min="0" class="form-control"
+                         id="cantidadMovimiento" th:field="*{cantidad}" required>
+                </div>
+                <div class="col-6">
+                  <label class="form-label" for="precioUnitarioMovimiento">Precio unitario</label>
+                  <input type="number" step="0.0001" min="0" class="form-control"
+                         id="precioUnitarioMovimiento" th:field="*{precioUnitario}">
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="idOrdenProduccion">Orden de produccion</label>
+                <input type="number" class="form-control" id="idOrdenProduccion"
+                       th:field="*{idOrdenProduccion}">
+                <div class="form-text">Obligatorio en las salidas: es la base de la regla RD4.</div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="fechaMovimiento">Fecha</label>
+                <input type="date" class="form-control" id="fechaMovimiento" th:field="*{fecha}">
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="observacionesMovimiento">Observaciones</label>
+                <textarea class="form-control" id="observacionesMovimiento" rows="2"
+                          th:field="*{observaciones}"></textarea>
+              </div>
+              <div class="d-flex gap-2 justify-content-end">
+                <button type="submit" class="btn btn-primary">Registrar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-8">
+        <div class="card h-100">
+          <div class="card-header">Movimientos del kardex</div>
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+              <tr><th>Fecha</th><th>Insumo</th><th>Tipo</th><th>Cantidad</th>
+                <th>Precio</th><th>Orden</th><th>Observaciones</th></tr>
+              </thead>
+              <tbody>
+              <tr th:each="m : ${movimientos}">
+                <td th:text="${m.fecha}">2026-11-12</td>
+                <td th:text="${m.idInsumo}">1</td>
+                <td>
+                  <span class="badge"
+                        th:classappend="${m.tipoMovimiento == 'INGRESO' ? 'bg-success'
+                          : (m.tipoMovimiento == 'SALIDA' ? 'bg-warning' : 'bg-secondary')}"
+                        th:text="${m.tipoMovimiento}">INGRESO</span>
+                </td>
+                <td th:text="${m.cantidad}">0</td>
+                <td th:text="${m.precioUnitario}">0</td>
+                <td th:text="${m.idOrdenProduccion}"></td>
+                <td th:text="${m.observaciones}"></td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(movimientos)}">
+                <td colspan="7" class="text-center text-muted py-4">
+                  No se encontraron datos para los criterios seleccionados.
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

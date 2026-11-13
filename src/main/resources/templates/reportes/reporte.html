@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head(${titulo})}"></head>
+<body>
+<div th:replace="~{layout :: layout(~{::contenido})}">
+  <div th:fragment="contenido">
+    <h2 class="titulo-pantalla" th:text="${tituloReporte}">Reporte gerencial</h2>
+
+    <div class="alert alert-success" th:if="${mensajeExito}" th:text="${mensajeExito}"></div>
+    <div class="alert alert-danger" th:if="${mensajeError}" th:text="${mensajeError}"></div>
+    <div class="alert alert-info" th:if="${mensajeSinDatos}" th:text="${mensajeSinDatos}"></div>
+
+    <div class="row g-3">
+      <div class="col-12 col-lg-3">
+        <div class="card h-100">
+          <div class="card-header">Filtros</div>
+          <div class="card-body">
+            <form method="get" th:action="@{${rutaReporte}}">
+              <div class="mb-3">
+                <label class="form-label" for="idClienteFiltro">Cliente</label>
+                <select class="form-select" id="idClienteFiltro" name="idCliente">
+                  <option value="">Todos</option>
+                  <option th:each="c : ${clientes}" th:value="${c.idCliente}"
+                          th:text="${c.razonSocial}">Cliente</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="idOperarioFiltro">Operario</label>
+                <select class="form-select" id="idOperarioFiltro" name="idOperario">
+                  <option value="">Todos</option>
+                  <option th:each="o : ${operarios}" th:value="${o.idOperario}"
+                          th:text="${o.codigo + ' - ' + o.nombres}">OP-001</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="idMaquinaFiltro">Maquina</label>
+                <select class="form-select" id="idMaquinaFiltro" name="idMaquina">
+                  <option value="">Todas</option>
+                  <option th:each="m : ${maquinas}" th:value="${m.idMaquina}"
+                          th:text="${m.codigo}">TC-001</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="desdeFiltro">Desde</label>
+                <input type="date" class="form-control" id="desdeFiltro" name="desde">
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="hastaFiltro">Hasta</label>
+                <input type="date" class="form-control" id="hastaFiltro" name="hasta">
+              </div>
+              <button type="submit" class="btn btn-primary w-100">Generar Reporte</button>
+            </form>
+
+            <hr>
+            <p class="small text-muted mb-2">Exportar el resultado</p>
+            <div class="btn-group btn-group-sm w-100">
+              <a class="btn btn-outline-secondary"
+                 th:href="@{${rutaReporte} + '/exportar?formato=PDF'}">PDF</a>
+              <a class="btn btn-outline-secondary"
+                 th:href="@{${rutaReporte} + '/exportar?formato=EXCEL'}">
+                Excel</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-9">
+        <div class="card mb-3" th:if="${indicadores != null and !indicadores.isEmpty()}">
+          <div class="card-header">Tablero de control</div>
+          <div class="card-body">
+            <div class="row g-2">
+              <div class="col-6 col-md-4 col-xl-2" th:each="k : ${indicadores}">
+                <div class="tarjeta-kpi">
+                  <p class="kpi-titulo" th:text="${k.titulo}">Indicador</p>
+                  <p class="kpi-valor" th:text="${k.valor}">0</p>
+                  <p class="kpi-detalle" th:text="${k.detalle}"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" th:if="${columnas != null}">
+          <div class="card-header">Detalle</div>
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+              <tr>
+                <th th:each="c : ${columnas}" th:text="${c}">Columna</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr th:each="f : ${filas}">
+                <td th:each="v : ${f}" th:text="${v}">Dato</td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(filas)}">
+                <td th:colspan="${#lists.size(columnas)}" class="text-center text-muted py-4">
+                  No se encontraron datos para los criterios seleccionados.
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

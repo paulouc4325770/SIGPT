@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head(${titulo})}"></head>
+<body>
+<div th:replace="~{layout :: layout(~{::contenido})}">
+  <div th:fragment="contenido">
+    <h2 class="titulo-pantalla" th:text="${titulo}">Proveedores</h2>
+
+    <div class="alert alert-success" th:if="${mensajeExito}" th:text="${mensajeExito}"></div>
+    <div class="alert alert-danger" th:if="${mensajeError}" th:text="${mensajeError}"></div>
+    <div class="alert alert-info" th:if="${mensajeSinDatos}" th:text="${mensajeSinDatos}"></div>
+
+    <div class="row g-3">
+      <div class="col-12 col-lg-4">
+        <div class="card h-100">
+          <div class="card-header">Registrar proveedor</div>
+          <div class="card-body">
+            <form th:action="@{/abastecimiento/proveedores/guardar}" method="post"
+                  th:object="${proveedor}">
+              <div class="mb-3">
+                <label class="form-label" for="razonSocial">Razon social</label>
+                <input type="text" class="form-control" id="razonSocial"
+                       th:field="*{razonSocial}" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="codigo">Codigo homologado</label>
+                <input type="text" class="form-control" id="codigo" th:field="*{codigo}"
+                       placeholder="PRV-004">
+                <div class="form-text">Si se deja vacio, el sistema lo genera.</div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="ruc">RUC</label>
+                <input type="text" class="form-control" id="ruc" th:field="*{ruc}">
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="tipo">Tipo</label>
+                <select class="form-select" id="tipo" th:field="*{tipo}" required>
+                  <option value="AGRICOLA">Agricola</option>
+                  <option value="GANADERA">Ganadera (cooperativa alpaquera)</option>
+                  <option value="QUIMICA">Quimica</option>
+                  <option value="MIXTA">Mixta</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="contacto">Contacto</label>
+                <input type="text" class="form-control" id="contacto" th:field="*{contacto}">
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="correo">Correo</label>
+                <input type="email" class="form-control" id="correo" th:field="*{correo}">
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="telefono">Telefono</label>
+                <input type="text" class="form-control" id="telefono" th:field="*{telefono}">
+              </div>
+              <div class="d-flex gap-2 justify-content-end">
+                <button type="submit" class="btn btn-primary">Grabar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-8">
+        <div class="card h-100">
+          <div class="card-header">Padron de proveedores</div>
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+              <tr><th>Codigo</th><th>Razon social</th><th>RUC</th><th>Tipo</th>
+                <th>Contacto</th><th>Correo</th><th>Estado</th></tr>
+              </thead>
+              <tbody>
+              <tr th:each="p : ${proveedores}">
+                <td th:text="${p.codigo}">PRV-001</td>
+                <td th:text="${p.razonSocial}">Proveedor</td>
+                <td th:text="${p.ruc}">20100011122</td>
+                <td th:text="${p.tipo}">AGRICOLA</td>
+                <td th:text="${p.contacto}">Contacto</td>
+                <td th:text="${p.correo}">correo</td>
+                <td>
+                  <span class="badge" th:classappend="${@clases.badge(p.estado)}"
+                        th:text="${p.estado}">ACTIVO</span>
+                </td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(proveedores)}">
+                <td colspan="7" class="text-center text-muted py-4">
+                  No se encontraron datos para los criterios seleccionados.
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

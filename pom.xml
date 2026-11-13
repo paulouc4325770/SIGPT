@@ -62,6 +62,17 @@
       <scope>runtime</scope>
     </dependency>
 
+    <!--
+      PDF de la Orden de Compra (EF-1001-5). OpenPDF es una biblioteca ligera
+      bajo licencia MPL/LGPL, compatible con Java 17 y sin dependencias de
+      iText proprietary.
+    -->
+    <dependency>
+      <groupId>com.github.librepdf</groupId>
+      <artifactId>openpdf</artifactId>
+      <version>2.0.3</version>
+    </dependency>
+
     <!-- RDS6: JUnit 5 + Mockito + AssertJ (viene con spring-boot-starter-test) -->
     <dependency>
       <groupId>org.springframework.boot</groupId>

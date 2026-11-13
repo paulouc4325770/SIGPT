@@ -2,6 +2,7 @@ package com.textilesandinos.sigpt.presentacion;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -12,7 +13,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import com.textilesandinos.sigpt.entidades.abastecimiento.CotizacionProveedor;
 import com.textilesandinos.sigpt.entidades.abastecimiento.Insumo;
+import com.textilesandinos.sigpt.entidades.abastecimiento.MovimientoKardex;
+import com.textilesandinos.sigpt.entidades.abastecimiento.OrdenCompra;
+import com.textilesandinos.sigpt.entidades.abastecimiento.Proveedor;
+import com.textilesandinos.sigpt.entidades.abastecimiento.SolicitudCotizacion;
 import com.textilesandinos.sigpt.entidades.pedidos.Adelanto;
 import com.textilesandinos.sigpt.entidades.pedidos.Cliente;
 import com.textilesandinos.sigpt.entidades.pedidos.Cotizacion;
@@ -29,9 +35,17 @@ import com.textilesandinos.sigpt.entidades.planta.OrdenFila;
 import com.textilesandinos.sigpt.entidades.planta.ParteDiarioProduccion;
 import com.textilesandinos.sigpt.entidades.planta.RegistroAvance;
 import com.textilesandinos.sigpt.entidades.planta.Turno;
+import com.textilesandinos.sigpt.entidades.reportes.ReporteGenerado;
+import com.textilesandinos.sigpt.entidades.reportes.ReporteGerencial;
 import com.textilesandinos.sigpt.entidades.seguridad.Opcion;
 import com.textilesandinos.sigpt.entidades.seguridad.Perfil;
 import com.textilesandinos.sigpt.entidades.seguridad.Usuario;
+import com.textilesandinos.sigpt.negocio.abastecimiento.CotizacionProveedorFormulario;
+import com.textilesandinos.sigpt.negocio.abastecimiento.InsumoFormulario;
+import com.textilesandinos.sigpt.negocio.abastecimiento.KardexFormulario;
+import com.textilesandinos.sigpt.negocio.abastecimiento.OrdenCompraFormulario;
+import com.textilesandinos.sigpt.negocio.abastecimiento.ProveedorFormulario;
+import com.textilesandinos.sigpt.negocio.abastecimiento.SolicitudCotizacionFormulario;
 import com.textilesandinos.sigpt.negocio.pedidos.AdelantoFormulario;
 import com.textilesandinos.sigpt.negocio.pedidos.CotizacionFormulario;
 import com.textilesandinos.sigpt.negocio.pedidos.PedidoFormulario;
@@ -172,8 +186,6 @@ public class PlantillaDePruebasController {
         resumen.setRegistrados(1);
         resumen.setCotizados(1);
         resumen.setEnProduccion(1);
-        resumen.setTerminados(0);
-        resumen.setAnulados(0);
 
         atributos.put("pedidos", List.of(fila));
         atributos.put("resumen", resumen);
@@ -183,7 +195,8 @@ public class PlantillaDePruebasController {
         atributos.put("filtroEstado", "");
         atributos.put("busqueda", "");
         atributos.put("pedidoEntidad", pedido);
-        atributos.put("detalle", detalle);        atributos.put("ficha", ficha);
+        atributos.put("detalle", detalle);
+        atributos.put("ficha", ficha);
         atributos.put("cotizaciones", List.of(cotizacion));
         atributos.put("cotizacion", new CotizacionFormulario());
         atributos.put("adelanto", new AdelantoFormulario());
@@ -285,18 +298,98 @@ public class PlantillaDePruebasController {
         atributos.put("porcentajeAvance", 34);
         atributos.put("varianzaPct", new BigDecimal("-16.67"));
 
-        // --- abastecimiento y reportes ---
+        // --- abastecimiento ---
+        Proveedor proveedor = new Proveedor();
+        proveedor.setIdProveedor(1);
+        proveedor.setCodigo("PRV-001");
+        proveedor.setRazonSocial("Cooperativa Alpaca Sur");
+        proveedor.setRuc("20111122233");
+        proveedor.setTipo("GANADERA");
+        proveedor.setEstado("ACTIVO");
+
         Insumo insumo = new Insumo();
+        insumo.setIdInsumo(1);
+        insumo.setCodigo("INS-FIB-001");
+        insumo.setIdProveedor(1);
+        insumo.setNombre("Lana de alpaca en fardo");
+        insumo.setTipo("FIBRA");
+        insumo.setUnidadMedida("KG");
+        insumo.setStockMinimo(new BigDecimal("500.00"));
+        insumo.setStockActual(new BigDecimal("1200.00"));
+        insumo.setPrecioUnitario(new BigDecimal("18.5000"));
+        insumo.setEstado("ACTIVO");
+
+        SolicitudCotizacion solicitud = new SolicitudCotizacion();
+        solicitud.setIdSolicitud(1);
+        solicitud.setCodigo("RFQ-2026-001");
+        solicitud.setIdOrdenProduccion(1);
+        solicitud.setFechaEmision(LocalDate.of(2026, 11, 12));
+        solicitud.setEstado("EMITIDA");
+
+        CotizacionProveedor cotizacionProveedor = new CotizacionProveedor();
+        cotizacionProveedor.setIdCotizacionProveedor(1);
+        cotizacionProveedor.setIdSolicitud(1);
+        cotizacionProveedor.setIdProveedor(1);
+        cotizacionProveedor.setPrecioUnitario(new BigDecimal("18.5000"));
+        cotizacionProveedor.setUnidad("KG");
+        cotizacionProveedor.setTiempoEntregaDias(7);
+        cotizacionProveedor.setEstado("RECIBIDA");
+
+        OrdenCompra ordenCompra = new OrdenCompra();
+        ordenCompra.setIdOrdenCompra(1);
+        ordenCompra.setCodigo("OC-2026-001");
+        ordenCompra.setIdProveedor(1);
+        ordenCompra.setMontoTotal(new BigDecimal("12500.00"));
+        ordenCompra.setMoneda("USD");
+        ordenCompra.setFechaEmision(LocalDate.of(2026, 11, 12));
+        ordenCompra.setFechaEntregaEsperada(LocalDate.of(2026, 11, 20));
+        ordenCompra.setEstado("EMITIDA");
+
+        MovimientoKardex movimiento = new MovimientoKardex();
+        movimiento.setIdMovimiento(1);
+        movimiento.setIdInsumo(1);
+        movimiento.setTipoMovimiento("INGRESO");
+        movimiento.setCantidad(new BigDecimal("120.00"));
+        movimiento.setPrecioUnitario(new BigDecimal("18.5000"));
+        movimiento.setFecha(LocalDate.of(2026, 11, 12));
+
+        atributos.put("proveedores", List.of(proveedor));
+        atributos.put("proveedor", new ProveedorFormulario());
         atributos.put("insumos", List.of(insumo));
-        atributos.put("insumo", insumo);
+        atributos.put("insumo", new InsumoFormulario());
         atributos.put("alertasStock", List.of());
+        atributos.put("solicitudes", List.of(solicitud));
+        atributos.put("solicitudForm", new SolicitudCotizacionFormulario());
+        atributos.put("cotizacionForm", new CotizacionProveedorFormulario());
+        atributos.put("cotizacionesProveedor", List.of(cotizacionProveedor));
+        atributos.put("solicitudSeleccionada", 1);
+        atributos.put("ordenesCompra", List.of(ordenCompra));
+        atributos.put("ordenForm", new OrdenCompraFormulario());
+        atributos.put("movimientos", List.of(movimiento));
+        atributos.put("kardexForm", new KardexFormulario());
+
+        // --- reportes ---
+        ReporteGerencial reporte = new ReporteGerencial();
+        reporte.setIdReporte(1);
+        reporte.setCodigo("AVANCE_PEDIDOS");
+        reporte.setNombre("Avance de Pedidos");
+
+        ReporteGenerado generado = new ReporteGenerado();
+        generado.setIdReporteGenerado(1L);
+        generado.setIdReporte(1);
+        generado.setCodUsuario("jperez");
+        generado.setFiltros("cliente=todos");
+        generado.setFormatoSalida("PANTALLA");
+        generado.setFechaGeneracion(LocalDateTime.of(2026, 11, 12, 10, 30));
+
+        atributos.put("reportes", List.of(reporte));
+        atributos.put("generados", List.of(generado));
+        atributos.put("codigoReporte", "AVANCE_PEDIDOS");
+        atributos.put("rutaReporte", "/reportes/avance-pedidos");
+        atributos.put("formatos", List.of());
+        atributos.put("columnas", List.of("Codigo", "Cliente", "Metros"));
+        atributos.put("filas", List.of(List.of("PED-2026-001", "Marca Andina", "3500")));
         atributos.put("indicadores", List.of());
-        atributos.put("filas", List.of());
-        atributos.put("columnas", List.of("Columna"));
-        atributos.put("semaforo", List.of());
-        atributos.put("mostrarCliente", true);
-        atributos.put("mostrarOperario", false);
-        atributos.put("mostrarMaquina", false);
 
         return atributos;
     }

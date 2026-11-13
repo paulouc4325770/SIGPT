@@ -52,10 +52,15 @@ class PruebasPlantillasTest {
             "pedidos/consulta",
             "pedidos/cotizaciones",
             "abastecimiento/insumos",
+            "abastecimiento/proveedores",
+            "abastecimiento/rfq",
+            "abastecimiento/ordenes-compra",
+            "abastecimiento/kardex",
             "planta/asignacion",
             "planta/avance",
             "planta/calidad",
-            "reportes/formulario"
+            "reportes/reporte",
+            "reportes/historial"
     })
     void renderizaPlantilla(String nombre) throws Exception {
         mockMvc.perform(get("/prueba-plantilla/" + nombre).session(sesionConPermiso(nombre)))
@@ -81,11 +86,16 @@ class PruebasPlantillasTest {
             "pedidos/clientes,       titulo-pantalla",
             "pedidos/consulta,       titulo-pantalla",
             "pedidos/cotizaciones,   titulo-pantalla",
-            "abastecimiento/insumos, titulo-pantalla",
-            "planta/asignacion,      titulo-pantalla",
-            "planta/avance,          titulo-pantalla",
-            "planta/calidad,         titulo-pantalla",
-            "reportes/formulario,    titulo-pantalla"
+            "abastecimiento/insumos,          titulo-pantalla",
+            "abastecimiento/proveedores,       titulo-pantalla",
+            "abastecimiento/rfq,               titulo-pantalla",
+            "abastecimiento/ordenes-compra,    titulo-pantalla",
+            "abastecimiento/kardex,            titulo-pantalla",
+            "planta/asignacion,                titulo-pantalla",
+            "planta/avance,                    titulo-pantalla",
+            "planta/calidad,                   titulo-pantalla",
+            "reportes/reporte,                 titulo-pantalla",
+            "reportes/historial,               titulo-pantalla"
     })
     void renderizaPlantillaUnaSolaVez(String nombre, String marcador) throws Exception {
         String html = mockMvc.perform(get("/prueba-plantilla/" + nombre)
