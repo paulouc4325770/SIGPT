@@ -249,6 +249,19 @@ done
 | Eficiencia industrial | `/reportes/eficiencia` | Jefe de Producción / Gerencia |
 | Historial de reportes | `/reportes/historial` | Jefe de Producción / Gerencia |
 
+#### Filtros de los reportes
+
+Cada reporte declara los filtros que aplica de verdad y la pantalla muestra solo
+esos; al pulsar **Generar Reporte** la selección y las fechas se conservan, y los
+enlaces de **PDF** y **Excel** heredan los mismos criterios.
+
+| Reporte | Cliente | Operario | Máquina | Rango de fechas (sobre) |
+|---|:--:|:--:|:--:|---|
+| Avance de pedidos | ✓ | – | – | fecha de entrega comprometida |
+| Productividad | – | ✓ | ✓ | fecha de la asignación |
+| Consumo de insumos y merma | – | – | – | fecha del kardex y del avance de planta |
+| Eficiencia industrial | – | – | – | fecha de inicio de la orden |
+
 ### Pruebas actuales
 
 | Suite | Casos | Qué cubre |
@@ -268,7 +281,10 @@ done
 | `InsumoLNTest` | 5 | **RD5** (MSDS obligatoria en químicos y tintes), proveedor inactivo |
 | `KardexLNTest` | 4 | Control de stock y **RD4** (varianza de consumo frente al teórico) |
 | `ReporteLNTest` | 7 | **Template Method**, **Bridge** y **Strategy** de los reportes |
-| **Total** | **122** | `mvn clean verify` |
+| `ReportesFiltrosTest` | 11 | Filtros de la pantalla de reportes: se aplican, se conservan y viajan a la exportación (PDF/Excel) |
+| `FiltrosReporteTest` | 5 | Rango de fechas inclusivo y cadena de consulta que comparten la pantalla y la exportación |
+| `TitulosPantallaTest` | 1 | El título y el encabezado de cada pantalla salen de su opción de menú |
+| **Total** | **139** | `mvn clean verify` |
 
 La integración continua (`.github/workflows/ci.yml`) levanta un **MySQL 8.0**
 en un contenedor, aplica `schema.sql` + `seed.sql` y ejecuta `mvn clean verify`

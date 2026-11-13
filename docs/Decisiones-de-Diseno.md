@@ -239,6 +239,8 @@ Solo donde hay un problema real que el patrón resuelve; un patrón puesto a la 
 
 Reportes × formatos forman además la estructura del **Bridge** de Semana 12 (la abstracción Reporte y la implementación Formato varían por separado): 4 reportes y 3 formatos dan 7 clases en vez de 12.
 
+La **Estrategia** también decide qué filtros ofrece cada reporte: cada cálculo de reporte declara los criterios que aplica de verdad (cliente, operario, máquina o rango de fechas) y la pantalla dibuja solo esos controles. Así ningún filtro visible queda sin efecto y la pantalla y la exportación comparten los mismos criterios.
+
 **Prioridad 2 — del catálogo GoF del curso, si el tiempo alcanza**
 
 | Patrón | Dónde | Alternativa mínima |
