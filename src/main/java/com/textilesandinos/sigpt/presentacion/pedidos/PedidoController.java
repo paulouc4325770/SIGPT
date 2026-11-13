@@ -51,12 +51,15 @@ public class PedidoController {
             @RequestParam(required = false) LocalDate hasta,
             Model modelo) {
         List<PedidoFila> pedidos = pedidoLN.listar(codigo, estado, idCliente, desde, hasta);
-        ResumenPedidos resumen = pedidoLN.resumir();
+        ResumenPedidos resumen = pedidoLN.resumir(pedidos);
         modelo.addAttribute("pedidos", pedidos);
         modelo.addAttribute("resumen", resumen);
         modelo.addAttribute("clientes", clienteLN.listar(null));
         modelo.addAttribute("filtroCodigo", codigo == null ? "" : codigo);
         modelo.addAttribute("filtroEstado", estado == null ? "" : estado);
+        modelo.addAttribute("filtroCliente", idCliente);
+        modelo.addAttribute("filtroDesde", desde);
+        modelo.addAttribute("filtroHasta", hasta);
         if (pedidos.isEmpty()) {
             modelo.addAttribute("mensajeSinDatos",
                     "No se encontraron datos para los criterios seleccionados.");

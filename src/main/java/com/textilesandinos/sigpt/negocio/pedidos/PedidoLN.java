@@ -70,6 +70,29 @@ public class PedidoLN {
     }
 
     /**
+     * Tablero de control calculado sobre los pedidos que se estan mostrando.
+     *
+     * <p>Si el usuario filtra por estado, cliente o fechas, el semaforo
+     * acompana al filtro: no puede decir "3 pedidos" mientras la tabla esta
+     * vacia.
+     */
+    public ResumenPedidos resumir(List<PedidoFila> pedidos) {
+        ResumenPedidos resumen = new ResumenPedidos();
+        for (PedidoFila pedido : pedidos) {
+            switch (pedido.getEstado() == null ? "" : pedido.getEstado()) {
+                case "REGISTRADO" -> resumen.setRegistrados(resumen.getRegistrados() + 1);
+                case "COTIZADO" -> resumen.setCotizados(resumen.getCotizados() + 1);
+                case "EN_PRODUCCION" -> resumen.setEnProduccion(resumen.getEnProduccion() + 1);
+                case "TERMINADO" -> resumen.setTerminados(resumen.getTerminados() + 1);
+                case "ANULADO" -> resumen.setAnulados(resumen.getAnulados() + 1);
+                default -> { }
+            }
+        }
+        resumen.setTotal(pedidos.size());
+        return resumen;
+    }
+
+    /**
      * Registra un pedido con su ficha tecnica (flujo 1 a 5 de EF-1001-3).
      *
      * @return identificador del pedido generado

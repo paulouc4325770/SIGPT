@@ -15,11 +15,22 @@
     <!-- Criterios de busqueda -->
     <form class="row g-2 mb-3" method="get" th:action="@{/pedidos/bandeja}">
       <div class="col-12 col-md-3">
-        <input type="text" class="form-control" name="codigo" placeholder="Codigo de pedido"
-               th:value="${filtroCodigo}">
+        <label class="form-label small mb-1" for="filtroCodigo">Codigo</label>
+        <input type="text" class="form-control" id="filtroCodigo" name="codigo"
+               placeholder="Codigo de pedido" th:value="${filtroCodigo}">
       </div>
       <div class="col-12 col-md-3">
-        <select class="form-select" name="estado">
+        <label class="form-label small mb-1" for="filtroCliente">Cliente</label>
+        <select class="form-select" id="filtroCliente" name="idCliente">
+          <option value="" th:selected="${filtroCliente == null}">Todos los clientes</option>
+          <option th:each="c : ${clientes}" th:value="${c.idCliente}"
+                  th:text="${c.razonSocial}"
+                  th:selected="${c.idCliente == filtroCliente}">Cliente</option>
+        </select>
+      </div>
+      <div class="col-12 col-md-2">
+        <label class="form-label small mb-1" for="filtroEstado">Estado</label>
+        <select class="form-select" id="filtroEstado" name="estado">
           <option value="">Todos los estados</option>
           <option value="REGISTRADO" th:selected="${filtroEstado == 'REGISTRADO'}">Registrado</option>
           <option value="COTIZADO" th:selected="${filtroEstado == 'COTIZADO'}">Cotizado</option>
@@ -30,14 +41,21 @@
         </select>
       </div>
       <div class="col-6 col-md-2">
-        <input type="date" class="form-control" name="desde" title="Fecha de entrega desde">
+        <label class="form-label small mb-1" for="filtroDesde">Entrega desde</label>
+        <input type="date" class="form-control" id="filtroDesde" name="desde"
+               th:value="${filtroDesde}">
       </div>
       <div class="col-6 col-md-2">
-        <input type="date" class="form-control" name="hasta" title="Fecha de entrega hasta">
+        <label class="form-label small mb-1" for="filtroHasta">Entrega hasta</label>
+        <input type="date" class="form-control" id="filtroHasta" name="hasta"
+               th:value="${filtroHasta}">
       </div>
-      <div class="col-12 col-md-2 d-flex gap-2">
-        <button type="submit" class="btn btn-outline-primary flex-fill">Buscar</button>
-        <a class="btn btn-primary flex-fill" th:href="@{/pedidos/nuevo}">Nuevo</a>
+      <div class="col-12 d-flex justify-content-end align-items-center gap-2">
+        <a class="btn btn-link btn-sm"
+           th:if="${filtroCodigo != '' or filtroEstado != '' or filtroCliente != null or filtroDesde != null or filtroHasta != null}"
+           th:href="@{/pedidos/bandeja}">Limpiar filtros</a>
+        <button type="submit" class="btn btn-outline-primary">Buscar</button>
+        <a class="btn btn-primary" th:href="@{/pedidos/nuevo}">Nuevo</a>
       </div>
     </form>
 
@@ -87,10 +105,10 @@
         <span>Pedidos registrados</span>
         <div class="btn-group btn-group-sm">
           <a class="btn btn-outline-secondary"
-             th:href="@{/pedidos/bandeja/exportar(formato='CSV',codigo=${filtroCodigo},estado=${filtroEstado})}">
+             th:href="@{/pedidos/bandeja/exportar(formato='CSV',codigo=${filtroCodigo},estado=${filtroEstado},idCliente=${filtroCliente},desde=${filtroDesde},hasta=${filtroHasta})}">
             CSV</a>
           <a class="btn btn-outline-secondary"
-             th:href="@{/pedidos/bandeja/exportar(formato='EXCEL',codigo=${filtroCodigo},estado=${filtroEstado})}">
+             th:href="@{/pedidos/bandeja/exportar(formato='EXCEL',codigo=${filtroCodigo},estado=${filtroEstado},idCliente=${filtroCliente},desde=${filtroDesde},hasta=${filtroHasta})}">
             Excel</a>
         </div>
       </div>
