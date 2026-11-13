@@ -280,12 +280,12 @@ enlaces de **PDF** y **Excel** heredan los mismos criterios.
 | `SigptApplicationTests` | 2 | Arranque del contexto de Spring |
 | `InsumoLNTest` | 5 | **RD5** (MSDS obligatoria en químicos y tintes), proveedor inactivo |
 | `KardexLNTest` | 4 | Control de stock y **RD4** (varianza de consumo frente al teórico) |
-| `ReporteLNTest` | 7 | **Template Method**, **Bridge** y **Strategy** de los reportes |
+| `ReporteLNTest` | 9 | **Template Method**, **Bridge** y **Strategy** de los reportes; filtros declarados por cada estrategia |
 | `ReportesFiltrosTest` | 11 | Filtros de la pantalla de reportes: se aplican, se conservan y viajan a la exportación (PDF/Excel) |
 | `PedidosBandejaTest` | 7 | Filtros de la bandeja de pedidos: se conservan, el semáforo sigue al filtro y la exportación hereda los criterios |
 | `FiltrosReporteTest` | 5 | Rango de fechas inclusivo y cadena de consulta que comparten la pantalla y la exportación |
 | `TitulosPantallaTest` | 1 | El título y el encabezado de cada pantalla salen de su opción de menú |
-| **Total** | **146** | `mvn clean verify` |
+| **Total** | **148** | `mvn clean verify` |
 
 La integración continua (`.github/workflows/ci.yml`) levanta un **MySQL 8.0**
 en un contenedor, aplica `schema.sql` + `seed.sql` y ejecuta `mvn clean verify`

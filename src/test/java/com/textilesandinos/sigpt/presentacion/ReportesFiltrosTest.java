@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -36,6 +38,9 @@ class ReportesFiltrosTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Test
     @DisplayName("el reporte muestra su titulo, no un encabezado vacio")
@@ -100,6 +105,11 @@ class ReportesFiltrosTest {
         String consumo = html("/reportes/consumo-merma", "");
         assertThat(consumo).contains("id=\"desdeFiltro\"");
         assertThat(consumo).doesNotContain("id=\"idClienteFiltro\"", "id=\"idOperarioFiltro\"");
+
+        String eficiencia = html("/reportes/eficiencia", "");
+        assertThat(eficiencia).contains("id=\"desdeFiltro\"");
+        assertThat(eficiencia).doesNotContain("id=\"idClienteFiltro\"",
+                "id=\"idOperarioFiltro\"", "id=\"idMaquinaFiltro\"");
     }
 
     @Test
@@ -115,12 +125,18 @@ class ReportesFiltrosTest {
     @Test
     @DisplayName("consumo y merma toma la merma del periodo")
     void consumoMermaDelPeriodo() throws Exception {
-        String html = html("/reportes/consumo-merma", "?desde=2026-11-12&hasta=2026-11-12");
+        // La semilla carga sus fechas con CURDATE(). Se consulta a la base de
+        // datos en lugar de fijar el dia de la maquina que ejecuta las pruebas:
+        // el runner de CI trabaja en UTC y puede estar en el dia siguiente.
+        LocalDate hoy = hoySegunLaBaseDeDatos();
+        String periodo = "?desde=" + hoy + "&hasta=" + hoy;
+        String html = html("/reportes/consumo-merma", periodo);
 
         assertThat(html).contains("Merma del periodo");
         assertThat(html).contains("30.00 m");
 
-        String vacio = html("/reportes/consumo-merma", "?desde=2020-01-01&hasta=2020-01-02");
+        String antiguo = "?desde=" + hoy.minusYears(5) + "&hasta=" + hoy.minusYears(5).plusDays(1);
+        String vacio = html("/reportes/consumo-merma", antiguo);
         assertThat(vacio).contains("0.00 m");
         assertThat(vacio).doesNotContain("30.00 m");
     }
@@ -128,10 +144,13 @@ class ReportesFiltrosTest {
     @Test
     @DisplayName("eficiencia industrial filtra por fecha de inicio de la orden")
     void eficienciaFiltraPorFecha() throws Exception {
-        String conDatos = html("/reportes/eficiencia", "?desde=2026-11-12&hasta=2026-11-12");
+        LocalDate hoy = hoySegunLaBaseDeDatos();
+        String periodo = "?desde=" + hoy + "&hasta=" + hoy;
+        String conDatos = html("/reportes/eficiencia", periodo);
         assertThat(conDatos).contains("OP-2026-001");
 
-        String sinDatos = html("/reportes/eficiencia", "?desde=2020-01-01&hasta=2020-01-02");
+        String antiguo = "?desde=" + hoy.minusYears(5) + "&hasta=" + hoy.minusYears(5).plusDays(1);
+        String sinDatos = html("/reportes/eficiencia", antiguo);
         assertThat(sinDatos).doesNotContain("OP-2026-001");
         assertThat(sinDatos).contains("No se encontraron datos");
     }
@@ -160,6 +179,11 @@ class ReportesFiltrosTest {
         String hoja = new String(contenido, java.nio.charset.StandardCharsets.UTF_8);
         assertThat(hoja).contains("PED-2026-002");
         assertThat(hoja).doesNotContain("PED-2026-001", "PED-2026-003");
+    }
+
+    /** Fecha "de hoy" segun el reloj de MySQL, que es el que uso la semilla. */
+    private LocalDate hoySegunLaBaseDeDatos() {
+        return jdbcTemplate.queryForObject("SELECT CURDATE()", LocalDate.class);
     }
 
     private String html(String ruta, String consulta) throws Exception {
