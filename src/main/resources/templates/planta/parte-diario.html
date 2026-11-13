@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head(${titulo})}"></head>
+<body>
+<div th:replace="~{layout :: layout(~{::contenido})}">
+  <div th:fragment="contenido">
+    <h2 class="titulo-pantalla" th:text="${titulo}">Parte Diario de Produccion</h2>
+
+    <div class="alert alert-success" th:if="${mensajeExito}" th:text="${mensajeExito}"></div>
+    <div class="alert alert-danger" th:if="${mensajeError}" th:text="${mensajeError}"></div>
+    <div class="alert alert-info" th:if="${mensajeSinDatos}" th:text="${mensajeSinDatos}"></div>
+
+    <div class="card mb-3">
+      <div class="card-header">Generar parte diario</div>
+      <div class="card-body">
+        <form class="row g-2 align-items-end" th:action="@{/planta/parte-diario/guardar}" method="post">
+          <div class="col-12 col-md-6">
+            <label class="form-label" for="idOrden">Orden de Produccion</label>
+            <select class="form-select" id="idOrden" name="idOrden" required>
+              <option value="">Seleccione</option>
+              <option th:each="orden : ${ordenes}" th:value="${orden.idOrden}"
+                      th:text="${orden.codOrden} + ' | ' + ${orden.metrosTotales} + ' m'">
+                OP-2026-0001</option>
+            </select>
+            <div class="form-text">
+              Se habilita cuando la orden alcanzo el 100 % del metraje consolidado.
+            </div>
+          </div>
+          <div class="col-12 col-md-3">
+            <button type="submit" class="btn btn-success w-100">Generar parte diario</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">Partes diarios registrados</div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+          <tr><th>Fecha</th><th>Horas hombre</th><th>Horas maquina</th><th>Metros</th>
+            <th>Observaciones</th></tr>
+          </thead>
+          <tbody>
+          <tr th:each="p : ${partes}">
+            <td th:text="${p.fecha}">2026-11-12</td>
+            <td th:text="${p.horasHombre}">0</td>
+            <td th:text="${p.horasMaquina}">0</td>
+            <td th:text="${p.metros}">0</td>
+            <td th:text="${p.observaciones}"></td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(partes)}">
+            <td colspan="5" class="text-center text-muted py-4">
+              No se encontraron datos para los criterios seleccionados.
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

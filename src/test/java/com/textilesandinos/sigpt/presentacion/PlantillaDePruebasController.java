@@ -28,6 +28,7 @@ import com.textilesandinos.sigpt.entidades.pedidos.PedidoDetalle;
 import com.textilesandinos.sigpt.entidades.pedidos.PedidoFila;
 import com.textilesandinos.sigpt.entidades.pedidos.ResumenPedidos;
 import com.textilesandinos.sigpt.entidades.planta.Asignacion;
+import com.textilesandinos.sigpt.entidades.planta.Incidencia;
 import com.textilesandinos.sigpt.entidades.planta.Lote;
 import com.textilesandinos.sigpt.entidades.planta.Maquina;
 import com.textilesandinos.sigpt.entidades.planta.Operario;
@@ -37,6 +38,7 @@ import com.textilesandinos.sigpt.entidades.planta.RegistroAvance;
 import com.textilesandinos.sigpt.entidades.planta.Turno;
 import com.textilesandinos.sigpt.entidades.reportes.ReporteGenerado;
 import com.textilesandinos.sigpt.entidades.reportes.ReporteGerencial;
+import com.textilesandinos.sigpt.entidades.seguridad.MatrizAcceso;
 import com.textilesandinos.sigpt.entidades.seguridad.Opcion;
 import com.textilesandinos.sigpt.entidades.seguridad.Perfil;
 import com.textilesandinos.sigpt.entidades.seguridad.Usuario;
@@ -384,6 +386,46 @@ public class PlantillaDePruebasController {
 
         atributos.put("reportes", List.of(reporte));
         atributos.put("generados", List.of(generado));
+        // seguridad (administracion) e incidencias
+        Usuario usuarioAdmin = new Usuario();
+        usuarioAdmin.setIdUsuario(2);
+        usuarioAdmin.setCodUsuario("jlogistica");
+        usuarioAdmin.setNombres("Luis Vera");
+        usuarioAdmin.setArea("Logistica");
+        usuarioAdmin.setPerfil(perfil);
+        atributos.put("usuarios", List.of(usuarioAdmin));
+        atributos.put("usuario", usuarioAdmin);
+        atributos.put("perfiles", List.of(perfil));
+
+        MatrizAcceso acceso = new MatrizAcceso();
+        acceso.setIdPerfil(1);
+        acceso.setCodPerfil("JPROD");
+        acceso.setNombrePerfil("Jefe de Produccion");
+        acceso.setIdOpcion(31);
+        acceso.setNombreOpcion("Inicio");
+        acceso.setUrlOpcion("/inicio");
+        acceso.setAsignado(true);
+        atributos.put("matriz", List.of(acceso));
+
+        Opcion opcionCatalogo = new Opcion();
+        opcionCatalogo.setIdOpcion(31);
+        opcionCatalogo.setNombreOpcion("Inicio");
+        opcionCatalogo.setUrlOpcion("/inicio");
+        opcionCatalogo.setNroOrden(1);
+        opcionCatalogo.setEstado(true);
+        atributos.put("opciones", List.of(opcionCatalogo));
+
+        Incidencia incidencia = new Incidencia();
+        incidencia.setIdIncidencia(1);
+        incidencia.setIdMaquina(1);
+        incidencia.setTipo("AVERIA");
+        incidencia.setDescripcion("El telar se detuvo");
+        incidencia.setEstado("ABIERTA");
+        atributos.put("incidencias", List.of(incidencia));
+        atributos.put("incidencia", incidencia);
+
+        atributos.put("sinVinculo", false);
+
         atributos.put("codigoReporte", "AVANCE_PEDIDOS");
         atributos.put("rutaReporte", "/reportes/avance-pedidos");
         atributos.put("formatos", List.of());

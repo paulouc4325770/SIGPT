@@ -106,7 +106,7 @@ INSERT INTO usuario (id_usuario, cod_usuario, clave_hash, nombres, area, id_perf
   (3, 'supervisor','210000:3QFLacLmePj3a1APLV2pGQ==:XIa2fOaa7whIS8ENTZ3KHUiOCEQLTiFlC0WINwCWRq8=', 'Marco Huaman Torres',   'Piso de Planta',            3),
   (4, 'operario',  '210000:1U8H5TO8HH6JqL5UAy7RVQ==:c3Z5vDd2ZausbAwpfsxrT7VQQbN1U3QtE5cutTqAa9M=', 'Ana Quispe Mamani',     'Piso de Planta',            4),
   (5, 'almacen',   '210000:PPPjrHPZsH7ai/boHrGBYw==:no4p7mnYcnlksAREvA3P9+PGHhP/myrENOusN1+XjFU=', 'Carlos Flores Ruiz',    'Almacen Central',           5),
-  (6, 'cliente',   '210000:Y2Lz+G2uOwo/TWgNzvzALw==:/YqlToBTIH6jDHngq0/RNkKoeFKdUos/v8sQZoAo7lU=', 'Maria Cotton Corp',      'Cliente Externo',           6),
+  (6, 'cliente',   '210000:Y2Lz+G2uOwo/TWgNzvzALw==:/YqlToBTIH6jDHngq0/RNkKoeFKdUos/v8sQZoAo7lU=', 'Retail Fashion Group Inc.', 'Cliente Externo',           6),
   (7, 'proveedor', '210000:oAQi3YeQPqo5jRpKopJgKA==:SkMolumogVdz1wM+tBJuIgMsQC3xyvasQXVluXt9YmE=', 'Cooperativa Alpaca Sur','Proveedor Externo',         7),
   (8, 'gerencia',  '210000:pucsds40kgtbomrOrs1jOQ==:t6t6zDXPEUIrpEj5eezUStoaf6I1Bgf1FRbisdAiGbg=', 'Elena Rojas Medina',    'Gerencia General',          8);
 

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head(${titulo})}"></head>
+<body>
+<div th:replace="~{layout :: layout(~{::contenido})}">
+  <div th:fragment="contenido">
+    <h2 class="titulo-pantalla" th:text="${titulo}">Estado de mis pedidos</h2>
+
+    <div class="alert alert-info" th:if="${sinVinculo}">
+      Su cuenta no tiene pedidos asociados. Si cree que es un error, contacte al
+      Jefe de Produccion.
+    </div>
+    <div class="alert alert-info" th:if="${cliente != null}">
+      Cliente: <strong th:text="${cliente.razonSocial}">Cliente</strong>
+      (<span th:text="${cliente.rucTaxId}">RUC</span>)
+    </div>
+
+    <div class="card" th:if="${pedidos != null and !pedidos.isEmpty()}">
+      <div class="card-header">Pedidos</div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+          <tr><th>Codigo</th><th>Tipo de hilado</th><th>Color</th><th>Metros</th>
+            <th>Avance</th><th>Fecha de entrega</th><th>Estado</th></tr>
+          </thead>
+          <tbody>
+          <tr th:each="pedido, iter : ${pedidos}">
+            <td th:text="${pedido.codPedido}">PED-2026-003</td>
+            <td th:text="${pedido.tipoHilado}">Open end 20/1</td>
+            <td th:text="${pedido.colorPantone}">19-4006 TCX</td>
+            <td th:text="${pedido.metros}">800</td>
+            <td style="min-width:140px">
+              <div class="progress">
+                <div class="progress-bar bg-primary"
+                     th:style="'width:' + ${pedido.porcentajeAvance} + '%'"
+                     th:text="${pedido.porcentajeAvance} + '%'">0%</div>
+              </div>
+            </td>
+            <td th:text="${pedido.fechaEntrega}">2026-12-12</td>
+            <td>
+              <span class="badge" th:classappend="${@clases.badge(pedido.estado)}"
+                    th:text="${pedido.estado}">REGISTRADO</span>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="alert alert-info" th:if="${pedidos != null and pedidos.isEmpty() and !sinVinculo}">
+      Todavia no hay pedidos registrados para su cuenta.
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

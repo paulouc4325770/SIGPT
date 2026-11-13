@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import com.textilesandinos.sigpt.datos.comun.DaoBase;
 import com.textilesandinos.sigpt.datos.comun.ParametroSql;
+import com.textilesandinos.sigpt.entidades.seguridad.MatrizAcceso;
 import com.textilesandinos.sigpt.entidades.seguridad.Opcion;
 
 /**
@@ -49,6 +50,28 @@ public class OpcionDAOImpl extends DaoBase implements OpcionDAO {
     public List<Opcion> listarTodas() {
         return consultarLista(SQL_BUSCAR + " ORDER BY id_opcion_ref IS NULL DESC, id_opcion_ref, "
                 + "nro_orden, id_opcion", List.of(), OpcionDAOImpl::mapear);
+    }
+
+    @Override
+    public List<MatrizAcceso> listarMatriz() {
+        return consultarLista("SELECT p.id_perfil, p.cod_perfil, p.nombre_perfil, "
+                + "o.id_opcion, o.nombre_opcion, o.url_opcion, "
+                + "(po.id_opcion IS NOT NULL) AS asignado "
+                + "FROM perfil p CROSS JOIN opcion o "
+                + "LEFT JOIN perfil_opcion po ON po.id_perfil = p.id_perfil "
+                + "AND po.id_opcion = o.id_opcion AND po.estado = TRUE "
+                + "ORDER BY p.id_perfil, o.id_opcion_ref IS NULL DESC, o.id_opcion_ref, o.nro_orden",
+                List.of(), resultado -> {
+                    MatrizAcceso fila = new MatrizAcceso();
+                    fila.setIdPerfil(resultado.getInt("id_perfil"));
+                    fila.setCodPerfil(resultado.getString("cod_perfil"));
+                    fila.setNombrePerfil(resultado.getString("nombre_perfil"));
+                    fila.setIdOpcion(resultado.getInt("id_opcion"));
+                    fila.setNombreOpcion(resultado.getString("nombre_opcion"));
+                    fila.setUrlOpcion(resultado.getString("url_opcion"));
+                    fila.setAsignado(resultado.getBoolean("asignado"));
+                    return fila;
+                });
     }
 
     @Override

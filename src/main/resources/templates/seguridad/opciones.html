@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head(${titulo})}"></head>
+<body>
+<div th:replace="~{layout :: layout(~{::contenido})}">
+  <div th:fragment="contenido">
+    <h2 class="titulo-pantalla" th:text="${titulo}">Opciones de Menu</h2>
+
+    <div class="card mb-3">
+      <div class="card-header">Catalogo de opciones</div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+          <tr><th>Id</th><th>Opcion</th><th>URL</th><th>Orden</th><th>Estado</th></tr>
+          </thead>
+          <tbody>
+          <tr th:each="o : ${opciones}">
+            <td th:text="${o.idOpcion}">1</td>
+            <td th:text="${o.nombreOpcion}">Opcion</td>
+            <td th:text="${o.urlOpcion}">/ruta</td>
+            <td th:text="${o.nroOrden}">1</td>
+            <td>
+              <span class="badge" th:classappend="${o.estado} ? 'bg-success' : 'bg-secondary'"
+                    th:text="${o.estado} ? 'Activa' : 'Inactiva'">Activa</span>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">Matriz de accesos</div>
+      <div class="table-responsive">
+        <table class="table table-hover table-sm align-middle mb-0">
+          <thead>
+          <tr>
+            <th>Perfil</th>
+            <th>Opcion</th>
+            <th>Asignada</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="fila : ${matriz}" th:if="${fila.idOpcion} != null">
+            <td th:text="${fila.nombrePerfil}">Perfil</td>
+            <td th:text="${fila.nombreOpcion}">Opcion</td>
+            <td>
+              <span class="badge" th:classappend="${fila.asignado} ? 'bg-success' : 'bg-secondary'"
+                    th:text="${fila.asignado} ? 'Si' : 'No'">Si</span>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head(${titulo})}"></head>
+<body>
+<div th:replace="~{layout :: layout(~{::contenido})}">
+  <div th:fragment="contenido">
+    <h2 class="titulo-pantalla" th:text="${titulo}">Incidencias de Maquinaria</h2>
+
+    <div class="alert alert-success" th:if="${mensajeExito}" th:text="${mensajeExito}"></div>
+    <div class="alert alert-danger" th:if="${mensajeError}" th:text="${mensajeError}"></div>
+    <div class="alert alert-info" th:if="${mensajeSinDatos}" th:text="${mensajeSinDatos}"></div>
+
+    <div class="row g-3">
+      <div class="col-12 col-lg-4">
+        <div class="card h-100">
+          <div class="card-header">Registrar incidencia</div>
+          <div class="card-body">
+            <form th:action="@{/planta/incidencias/guardar}" method="post"
+                  th:object="${incidencia}">
+              <div class="mb-3">
+                <label class="form-label" for="tipo">Tipo</label>
+                <select class="form-select" id="tipo" th:field="*{tipo}" required>
+                  <option value="AVERIA">Averia</option>
+                  <option value="PARADA">Parada</option>
+                  <option value="FALLA_TELAR">Falla de telar</option>
+                  <option value="OTRO">Otro</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="idMaquina">Maquina</label>
+                <select class="form-select" id="idMaquina" th:field="*{idMaquina}">
+                  <option value="">Sin maquina</option>
+                  <option th:each="m : ${maquinas}" th:value="${m.idMaquina}"
+                          th:text="${m.codigo + ' - ' + m.nombre}">TC-001</option>
+                </select>
+                <div class="form-text">La maquina pasa a estado de mantenimiento.</div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="descripcion">Descripcion</label>
+                <textarea class="form-control" id="descripcion" rows="3"
+                          th:field="*{descripcion}" required></textarea>
+              </div>
+              <div class="d-flex gap-2 justify-content-end">
+                <button type="submit" class="btn btn-primary">Registrar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-8">
+        <div class="card h-100">
+          <div class="card-header">Incidencias registradas</div>
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+              <tr><th>Tipo</th><th>Maquina</th><th>Descripcion</th><th>Estado</th><th></th></tr>
+              </thead>
+              <tbody>
+              <tr th:each="i : ${incidencias}">
+                <td th:text="${i.tipo}">AVERIA</td>
+                <td th:text="${i.idMaquina}">1</td>
+                <td th:text="${i.descripcion}">Descripcion</td>
+                <td>
+                  <span class="badge" th:classappend="${@clases.badge(i.estado)}"
+                        th:text="${i.estado}">ABIERTA</span>
+                </td>
+                <td class="text-end">
+                  <form th:if="${i.estado != 'CERRADA'}"
+                        th:action="@{/planta/incidencias/cerrar}" method="post">
+                    <input type="hidden" name="idIncidencia" th:value="${i.idIncidencia}">
+                    <button type="submit" class="btn btn-sm btn-outline-success">Cerrar</button>
+                  </form>
+                </td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(incidencias)}">
+                <td colspan="5" class="text-center text-muted py-4">
+                  No se encontraron datos para los criterios seleccionados.
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

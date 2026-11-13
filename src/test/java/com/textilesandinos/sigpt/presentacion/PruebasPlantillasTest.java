@@ -44,11 +44,15 @@ class PruebasPlantillasTest {
     @ParameterizedTest(name = "la plantilla {0} se renderiza sin errores")
     @ValueSource(strings = {
             "seguridad/login",
+            "seguridad/usuarios",
+            "seguridad/perfiles",
+            "seguridad/opciones",
             "inicio",
             "error/error",
             "pedidos/bandeja",
             "pedidos/formulario",
             "pedidos/clientes",
+            "pedidos/estado",
             "pedidos/consulta",
             "pedidos/cotizaciones",
             "abastecimiento/insumos",
@@ -59,6 +63,8 @@ class PruebasPlantillasTest {
             "planta/asignacion",
             "planta/avance",
             "planta/calidad",
+            "planta/incidencias",
+            "planta/parte-diario",
             "reportes/reporte",
             "reportes/historial"
     })
@@ -79,11 +85,15 @@ class PruebasPlantillasTest {
     @ParameterizedTest(name = "la plantilla {0} no se repite el contenido")
     @CsvSource({
             "seguridad/login,        Ingresar",
+            "seguridad/usuarios,     titulo-pantalla",
+            "seguridad/perfiles,     titulo-pantalla",
+            "seguridad/opciones,     titulo-pantalla",
             "inicio,                 titulo-pantalla",
             "error/error,            codigo-error",
             "pedidos/bandeja,        titulo-pantalla",
             "pedidos/formulario,     titulo-pantalla",
             "pedidos/clientes,       titulo-pantalla",
+            "pedidos/estado,         titulo-pantalla",
             "pedidos/consulta,       titulo-pantalla",
             "pedidos/cotizaciones,   titulo-pantalla",
             "abastecimiento/insumos,          titulo-pantalla",
@@ -94,6 +104,8 @@ class PruebasPlantillasTest {
             "planta/asignacion,                titulo-pantalla",
             "planta/avance,                    titulo-pantalla",
             "planta/calidad,                   titulo-pantalla",
+            "planta/incidencias,               titulo-pantalla",
+            "planta/parte-diario,              titulo-pantalla",
             "reportes/reporte,                 titulo-pantalla",
             "reportes/historial,               titulo-pantalla"
     })

@@ -197,6 +197,12 @@ public class PedidoDAOImpl extends DaoBase implements PedidoDAO {
         fila.setFechaEntrega(resultado.getDate("fecha_entrega") == null ? null
                 : resultado.getDate("fecha_entrega").toLocalDate());
         fila.setEstado(resultado.getString("estado"));
+        BigDecimal metros = fila.getMetros() == null ? BigDecimal.ZERO : fila.getMetros();
+        BigDecimal consolidado = fila.getMetrosConsolidados() == null ? BigDecimal.ZERO
+                : fila.getMetrosConsolidados();
+        fila.setPorcentajeAvance(metros.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO
+                : consolidado.multiply(BigDecimal.valueOf(100))
+                        .divide(metros, 2, java.math.RoundingMode.HALF_UP));
         return fila;
     }
 

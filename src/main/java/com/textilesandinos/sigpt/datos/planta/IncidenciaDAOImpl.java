@@ -62,6 +62,13 @@ public class IncidenciaDAOImpl extends DaoBase implements IncidenciaDAO {
     }
 
     @Override
+    public int actualizarEstado(int idIncidencia, String estado) {
+        return ejecutar("UPDATE incidencia SET estado = ? WHERE id_incidencia = ?",
+                List.of(ParametroSql.texto("estado", estado),
+                        ParametroSql.entero("id_incidencia", idIncidencia)));
+    }
+
+    @Override
     public List<Incidencia> listarPorMaquina(int idMaquina) {
         return consultarLista(SQL_BUSCAR + "WHERE id_maquina = ? ORDER BY id_incidencia DESC",
                 List.of(ParametroSql.entero("id_maquina", idMaquina)), IncidenciaDAOImpl::mapear);

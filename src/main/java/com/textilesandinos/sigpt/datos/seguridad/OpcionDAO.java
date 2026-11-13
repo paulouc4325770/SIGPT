@@ -2,6 +2,7 @@ package com.textilesandinos.sigpt.datos.seguridad;
 
 import java.util.List;
 
+import com.textilesandinos.sigpt.entidades.seguridad.MatrizAcceso;
 import com.textilesandinos.sigpt.entidades.seguridad.Opcion;
 
 /**
@@ -15,6 +16,9 @@ public interface OpcionDAO {
 
     /** Lista todas las opciones del sistema. */
     List<Opcion> listarTodas();
+
+    /** Matriz de accesos: cada perfil con las opciones del menu y su asignacion. */
+    List<MatrizAcceso> listarMatriz();
 
     java.util.Optional<Opcion> buscarPorId(int idOpcion);
 

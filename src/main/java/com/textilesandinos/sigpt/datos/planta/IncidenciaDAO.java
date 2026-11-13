@@ -17,4 +17,7 @@ public interface IncidenciaDAO {
 
     /** Todas las incidencias, de la mas reciente a la mas antigua. */
     List<Incidencia> listarTodas();
+
+    /** Cambia el estado de la incidencia (ABIERTA, EN_ATENCION, CERRADA). */
+    int actualizarEstado(int idIncidencia, String estado);
 }

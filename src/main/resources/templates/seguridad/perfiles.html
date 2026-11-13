@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head(${titulo})}"></head>
+<body>
+<div th:replace="~{layout :: layout(~{::contenido})}">
+  <div th:fragment="contenido">
+    <h2 class="titulo-pantalla" th:text="${titulo}">Perfiles y accesos</h2>
+
+    <div class="alert alert-success" th:if="${mensajeExito}" th:text="${mensajeExito}"></div>
+    <div class="alert alert-danger" th:if="${mensajeError}" th:text="${mensajeError}"></div>
+
+    <div class="card mb-3">
+      <div class="card-header">Perfiles del sistema</div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+          <tr><th>Codigo</th><th>Perfil</th><th>Descripcion</th><th>Estado</th></tr>
+          </thead>
+          <tbody>
+          <tr th:each="p : ${perfiles}">
+            <td th:text="${p.codPerfil}">JPROD</td>
+            <td th:text="${p.nombrePerfil}">Jefe de Produccion</td>
+            <td th:text="${p.descripcion}"></td>
+            <td>
+              <span class="badge" th:classappend="${p.estado} ? 'bg-success' : 'bg-secondary'"
+                    th:text="${p.estado} ? 'Activo' : 'Inactivo'">Activo</span>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">Matriz de accesos (perfil x opcion de menu)</div>
+      <div class="table-responsive">
+        <table class="table table-hover table-sm align-middle mb-0">
+          <thead>
+          <tr>
+            <th>Opcion</th>
+            <th th:each="p : ${perfiles}" th:text="${p.codPerfil}">JPROD</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="fila : ${matriz}">
+            <td th:text="${fila.nombreOpcion}">Opcion</td>
+            <td th:each="p : ${perfiles}">
+              <span th:if="${fila.asignado and fila.idPerfil == p.idPerfil}"
+                    class="badge bg-success">X</span>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -20,6 +20,7 @@ public class PedidoFila {
     private String colorPantone;
     private BigDecimal metros;
     private BigDecimal metrosConsolidados;
+    private BigDecimal porcentajeAvance = new BigDecimal("0.00");
     private LocalDate fechaEntrega;
     private String estado;
 
@@ -89,6 +90,14 @@ public class PedidoFila {
 
     public BigDecimal getMetrosConsolidados() {
         return metrosConsolidados;
+    }
+
+    public BigDecimal getPorcentajeAvance() {
+        return porcentajeAvance;
+    }
+
+    public void setPorcentajeAvance(BigDecimal porcentajeAvance) {
+        this.porcentajeAvance = porcentajeAvance;
     }
 
     public void setMetrosConsolidados(BigDecimal metrosConsolidados) {
